@@ -1,0 +1,37 @@
+twitter:
+ credentials:
+  consumer_key:       my_consumer_key
+  consumer_secret:    my_consumer_secret
+  token:              my_token
+  secret:             my_secret
+ settings:
+  friend_id:          12345
+  friend_screen_name: MyFriend
+facebook:
+ credentials:
+  consumer_key:       my_consumer_key
+  consumer_secret:    my_consumer_secret
+  token:              my_token
+ settings:
+  friend_id:          12345
+  page_id:            12345
+linkedin:
+ credentials:
+  client_id:          my_consumer_key
+  client_secret:      my_consumer_secret
+  token:              my_token
+linkedinv2:
+ credentials:
+  client_id:          my_consumer_key
+  client_secret:      my_consumer_secret
+  token:              my_token
+instagram:
+ credentials:
+  client_id:          my_consumer_key
+  client_secret:      my_consumer_secret
+  token:              my_token
+bitly:
+ credentials:
+  client_id:          my_consumer_key
+  client_secret:      my_consumer_secret
+  token:              my_token

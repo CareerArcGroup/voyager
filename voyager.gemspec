@@ -4,7 +4,7 @@ require File.expand_path("../lib/voyager/version", __FILE__)
 
 Gem::Specification.new do |s|
   s.name	= 'voyager'
-  s.date	= '2021-1-12'
+  s.date	= '2021-01-12'
   s.summary	= "Voyager"
   s.version	= Voyager::VERSION
   s.platform    = Gem::Platform::RUBY

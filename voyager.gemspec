@@ -4,7 +4,7 @@ require File.expand_path("../lib/voyager/version", __FILE__)
 
 Gem::Specification.new do |s|
   s.name	= 'voyager'
-  s.date	= '2012-03-15'
+  s.date	= '2021-01-12'
   s.summary	= "Voyager"
   s.version	= Voyager::VERSION
   s.platform    = Gem::Platform::RUBY
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "oauth", "~> 0"
   s.add_dependency "oauth2", "~> 1.4"
   s.add_dependency "json", "~> 2.2"
-  s.add_dependency "multipart-post", "~> 2.0.0"
+  s.add_dependency "multipart-post", "~> 2.1.1"
   s.add_development_dependency "bundler", "~> 1.12"
   s.add_development_dependency "rspec", "~> 3.5"
   s.add_development_dependency "simplecov", "~> 0"

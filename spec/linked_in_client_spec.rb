@@ -6,9 +6,9 @@ LINKEDIN_TEST_COMPANY_ID = 2414183
 LINKEDIN_TEST_COMPANY_URN = "urn:li:organization:2414183"
 
 
-config = SpecHelper::Config.new(Voyager::LinkedinClient)
+config = SpecHelper::Config.new(Voyager::LinkedInClient)
 
-describe LinkedinClient do
+describe LinkedInClient do
 
   it "get an OK response from the LinkedIn test endpoint" do
     config.client.should be_connected

@@ -1,5 +1,5 @@
 module Voyager
-  class LinkedinParser < Parser
+  class LinkedInParser < Parser
 
     RATE_LIMITED_MESSAGE = "Throttle limit for calls to this resource is reached."
 

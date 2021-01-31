@@ -15,10 +15,6 @@ module Voyager
     # Client Initializers and Public Methods
     # ============================================================================
 
-    def initialize(options = {})
-      @options = options
-    end
-
     def authorize_url(redirect_uri, options = {})
       oauth_client.auth_code.authorize_url(options.merge(redirect_uri: redirect_uri))
     end
@@ -27,6 +23,15 @@ module Voyager
       @access_token = oauth_client.auth_code.get_token(code, options.merge(redirect_uri: redirect_uri, mode: token_mode))
       @token = @access_token.token
       @access_token
+    end
+
+    def refresh!
+      return if access_token.nil? || access_token.refresh_token.nil?
+
+      refreshed_token = access_token.refresh!
+
+      @token = refreshed_token&.token
+      @access_token = refreshed_token
     end
 
     # ============================================================================
@@ -99,10 +104,11 @@ module Voyager
 
     class FilteredLogger < Faraday::Response::Logger
       def initialize(app, logger, filtered_terms)
-        @actual_logger = logger
+        @actual_logger  = logger
+        @logger         = Voyager::Logging::HttpLogger.new
         @filtered_terms = filtered_terms
 
-        super(app, Voyager::Logging::HttpLogger.new, bodies: true, headers: true)
+        super(app, @logger, bodies: true, headers: true)
       end
 
       def call(env)

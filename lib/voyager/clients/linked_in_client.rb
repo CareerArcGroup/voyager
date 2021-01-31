@@ -1,5 +1,5 @@
 module Voyager
-  class LinkedinClient < OAuth2Client
+  class LinkedInClient < OAuth2Client
 
     # ============================================================================
     # Client Initializers and Public Methods
@@ -77,7 +77,7 @@ module Voyager
     end
 
     def response_parser
-      Voyager::LinkedinParser
+      Voyager::LinkedInParser
     end
 
   end

@@ -69,7 +69,13 @@ module SpecHelper
     end
 
     def platform
-      @klass.name.downcase.gsub(/client/, '').split('::').last
+      @klass.name
+        .split('::').last
+        .gsub(/Client$/, '')
+        .gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+        .gsub(/([a-z\d])([A-Z])/,'\1_\2')
+        .tr("-", "_")
+        .downcase
     end
   end
 end

@@ -15,22 +15,17 @@ facebook:
  settings:
   friend_id:          12345
   page_id:            12345
-linkedin:
- credentials:
-  client_id:          my_consumer_key
-  client_secret:      my_consumer_secret
-  token:              my_token
-linkedinv2:
- credentials:
-  client_id:          my_consumer_key
-  client_secret:      my_consumer_secret
-  token:              my_token
-instagram:
+linked_in:
  credentials:
   client_id:          my_consumer_key
   client_secret:      my_consumer_secret
   token:              my_token
 bitly:
+ credentials:
+  client_id:          my_consumer_key
+  client_secret:      my_consumer_secret
+  token:              my_token
+microsoft_graph:
  credentials:
   client_id:          my_consumer_key
   client_secret:      my_consumer_secret

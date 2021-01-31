@@ -1,4 +1,3 @@
-
 module Voyager
   class LinkedInClient < OAuth2Client
 
@@ -10,9 +9,13 @@ module Voyager
       options[:site] ||= 'https://api.linkedin.com'
       options[:authorize_url] ||= 'https://www.linkedin.com/oauth/v2/authorization'
       options[:token_url]     ||= 'https://www.linkedin.com/oauth/v2/accessToken'
-      options[:path_prefix] ||= '/v1'
+      options[:path_prefix] ||= '/v2'
 
       super(options)
+    end
+
+    def authorize_url(redirect_uri, options={})
+      super(redirect_uri, options.merge(scope: options[:scope].join(' ')))
     end
 
     def connected?
@@ -27,35 +30,11 @@ module Voyager
     # Status Methods - These act on Shares
     # ============================================================================
 
-    # Updates the authenticating user's status, also known as sharing.
-    # Options:
-    #   comment                 Text of share. Share must contain comment and/or (title and submittent_url). Max length 700 bytes
-    #   content                 Parent container for the following options
-    #     title                 Title of share. Share must contain comment and/or (title and submittent_url). Max length 200 bytes
-    #     description           Description of share. Max length 256 bytes
-    #     submitted_url         URL for shared content. Invalid without title
-    #     submitted_image_url   URL for image of shared content. Invalid without title and submitted_url
-    #   visibility              Parent container for visibility code
-    #     code                  One of 'anyone' (all members) or 'connections-only'
-    #
-    def share(options={})
-      post("/people/~/shares", options)
-    end
+    # for request shape see:
+    # https://docs.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/share-api#post-shares
 
-    # Creates a share on the specified company page (user must be an administrator
-    # and must have authorized the client with the rw_company_admin scope)
-    # Options:
-    #   comment                 Text of share. Share must contain comment and/or (title and submittent_url). Max length 700 bytes
-    #   content                 Parent container for the following options
-    #     title                 Title of share. Share must contain comment and/or (title and submittent_url). Max length 200 bytes
-    #     description           Description of share. Max length 256 bytes
-    #     submitted_url         URL for shared content. Invalid without title
-    #     submitted_image_url   URL for image of shared content. Invalid without title and submitted_url
-    #   visibility              Parent container for visibility code
-    #     code                  One of 'anyone' (all members) or 'connections-only'
-    #
-    def company_share(company_id, options={})
-      post("/companies/#{company_id}/shares", options)
+    def share(options={})
+      post("/shares", options)
     end
 
     # ============================================================================
@@ -65,29 +44,31 @@ module Voyager
     # get general information about the user. optionally pass in an array
     # of specific fields to get a refined list of information...
     def account_info(*fields)
-      field_selector = (fields != nil && fields.any?) ? ":(#{fields.join(',')})" : ''
-      get("/people/~#{field_selector}")
+      get("/me#{field_selector(fields)}")
     end
 
     # get the list of companies of which the user is an administrator...
     def admin_for_companies
-      get("/companies", :"is-company-admin" => true, :"count" => 100)
+      get("/organizationalEntityAcls?q=roleAssignee&role=ADMINISTRATOR&state=APPROVED&count=100")
     end
 
     # get general information about a company. optionally pass in an array
     # of specific fields to get a refined list of information...
     def company_info(company_id, *fields)
-      field_selector = (fields != nil && fields.any?) ? ":(#{fields.join(',')})" : ''
-      get("/companies/#{company_id}#{field_selector}")
+      get("/organizations/#{company_id}#{field_selector(fields)}")
     end
 
     protected
+
+    def field_selector(fields)
+      (fields != nil && fields.any?) ? "?projection=(#{fields.join(',')})" : ''
+    end
 
     def add_standard_headers(headers={})
       super(headers.merge(
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        'x-li-format' => 'json'
+        'X-Restli-Protocol-Version' => '2.0.0'
       ))
     end
 

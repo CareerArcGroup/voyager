@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.summary	= "Voyager"
   s.version	= Voyager::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.description = "Twitter library for TweetMyJobs and SNI"
-  s.authors	= ["Stephen Roos"]
-  s.email	= 'sroos@tweetmyjobs.com'
+  s.description = "Social Media APIs"
+  s.authors	= ["Christopher Wu"]
+  s.email	= 'cwu@careerarc.com'
   s.homepage	= 'https://github.com/CareerArcGroup/voyager'
   s.license = 'MIT'
 

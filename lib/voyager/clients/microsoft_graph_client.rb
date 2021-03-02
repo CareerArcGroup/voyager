@@ -15,8 +15,10 @@ module Voyager
       super(options)
     end
 
-    def authorize_url(redirect_uri, options = {})
-      super(redirect_uri, options.merge(scope: options[:scope].join(' ')))
+    def authorize_url(redirect_uri, addl_configs = {})
+      scope = addl_configs.delete(:scope) || options[:scope]
+      auth_options = options.merge(scope: scope.join(' ')).merge(addl_configs)
+      super(redirect_uri, auth_options)
     end
 
     def connected?
@@ -51,6 +53,34 @@ module Voyager
 
     def drive_items(item_id = 'root', options = {})
       get("/me/drive/#{item_id}/children", options)
+    end
+
+    def drive_children(drive_ids)
+      drive_ids.map do |drive_id|
+        get("/drives/#{drive_id}/root/children")
+      end
+    end
+
+    # ============================================================================
+    # Sites
+    # ============================================================================
+
+    def site_root
+      get('/sites/root')
+    end
+
+    def sub_sites(site_id)
+      get("/sites/#{site_id}/sites")
+    end
+
+    def followed_sites
+      get('/me/followedSites')
+    end
+
+    def site_drives(site_ids)
+      site_ids.map do |site_id|
+        get("/sites/#{site_id}/drives")
+      end
     end
 
     protected

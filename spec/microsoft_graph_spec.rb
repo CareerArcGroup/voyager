@@ -12,7 +12,6 @@ describe MicrosoftGraphClient do
     url = config.client.authorize_url('https://example.com/callback', scope: %w[profile mail name Files.Read.All], state: 'state123')
     uri = URI.parse(url)
     query = URI.decode_www_form(uri.query).to_h
-
     expect(uri.scheme).to eq('https')
     expect(uri.host).to eq('login.microsoftonline.com')
     expect(uri.path).to eq('/common/oauth2/v2.0/authorize')
@@ -62,6 +61,43 @@ describe MicrosoftGraphClient do
         # expects there to be at least one drive item in the connected account's OneDrive
         # if this fails, you may need to add a file/folder
         expect(response.data['value'].map { |drive_item| drive_item['name'] }).not_to be_empty
+      end
+    end
+
+    describe '#site_root' do
+      it 'returns the root info of the user\'s Sharepoint site' do
+        response = config.client.site_root
+
+        expect(response.data['displayName']).not_to be_empty
+      end
+    end
+
+    describe '#sub_sites' do
+      it 'returns a collection of the root site\'s sub_sites' do
+        root = config.client.site_root
+        root_id = root.data['id']
+        response = config.client.sub_sites(root_id)
+
+        expect(response.data['value'].map { |site| site['name'] }).not_to be_empty
+      end
+    end
+
+    describe '#followed_sites' do
+      it 'returns a collection of sites followed by the authed user' do
+        response = config.client.followed_sites
+
+        expect(response.data['value']).not_to be_empty
+      end
+    end
+
+    describe '#site_drives' do
+      it 'returns a collection of drives connected to a given site' do
+        sites = config.client.followed_sites
+        site_ids = sites.data['value'].map { |v| v['id'] }
+        response = config.client.site_drives(site_ids)
+        drive_type = response.map{|obj| obj.data['value'].map{|v| v['driveType']}}.flatten.compact
+
+        expect(drive_type).not_to be_empty
       end
     end
   end

@@ -15,12 +15,12 @@ module Voyager
 
     def initialize(options = {})
       options[:site] ||= 'https://graph.facebook.com'
-      options[:path_prefix] ||= '/v6.0'
+      options[:path_prefix] ||= '/v10.0'
       super(options)
     end
 
     def authorize_url(redirect_uri, options = {})
-      uri_with_query('https://www.facebook.com/v3.0/dialog/oauth', options.merge(client_id: client_id, redirect_uri: redirect_uri))
+      uri_with_query('https://www.facebook.com/v10.0/dialog/oauth', options.merge(client_id: client_id, redirect_uri: redirect_uri))
     end
 
     def authorize(code, redirect_uri, options = {})
@@ -130,9 +130,7 @@ module Voyager
 
     def upload_photo(image_or_url, options = {})
       edge    = extract_edge!(options)
-      options = multipart?(item: image_or_url) ?
-        options.merge(source: image_or_url) :
-        options.merge(url: image_or_url)
+      options = multipart?(item: image_or_url) ? options.merge(source: image_or_url) : options.merge(url: image_or_url)
 
       post("/#{edge}/photos", options)
     end

@@ -50,11 +50,11 @@ module Voyager
     # Simple HTTP methods
     # ============================================================================
 
-    def get(path, params={})
-      perform_request(:get, uri_with_query(path, params))
+    def get(path, params={}, headers={})
+      perform_request(:get, uri_with_query(path, params), '', headers)
     end
 
-    def post(path, body='')
+    def post(path, body='', headers={})
       update_runtime_terms(body) if body.is_a?(Hash)
       perform_request(:post, path, body)
     end

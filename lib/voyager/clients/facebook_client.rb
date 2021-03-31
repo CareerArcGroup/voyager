@@ -76,7 +76,7 @@ module Voyager
         return nil unless token_response.successful?
 
         token_info = token_response.data['data']
-        expires_at = token_info['expires_at'] || 0
+        expires_at = token_info['data_access_expires_at'] || 0
         expires_at.positive? ? Time.at(expires_at) : (Time.now + LONG_TOKEN_EXPIRES_IN)
       end
     end
@@ -86,6 +86,11 @@ module Voyager
     # ============================================================================
     def account_info(options = {})
       edge_info('me', options)
+    end
+
+    def account_logo(options = {})
+      options = {height: 200, redirect: false}.merge!(options)
+      picture(options)
     end
 
     def edge_info(edge, options = {})
@@ -101,6 +106,10 @@ module Voyager
       post("/#{edge}/feed", options)
     end
 
+    # def company_info(id, options = {})
+    #   get("/#{id}", options)
+    # end
+
     # ============================================================================
     # Facebook Jobs Methods
     # ============================================================================
@@ -112,6 +121,14 @@ module Voyager
 
     def job_applications(external_job_id)
       get("/#{external_job_id}/job_applications")
+    end
+
+    # ============================================================================
+    # Location
+    # ============================================================================
+
+    def locations(options = {})
+      get('/me/locations', options)
     end
 
     # ============================================================================
@@ -133,6 +150,10 @@ module Voyager
       options = multipart?(item: image_or_url) ? options.merge(source: image_or_url) : options.merge(url: image_or_url)
 
       post("/#{edge}/photos", options)
+    end
+
+    def picture(options = {})
+      get('/me/picture', options)
     end
 
     # ============================================================================

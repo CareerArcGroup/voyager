@@ -23,6 +23,12 @@ describe FacebookClient do
       response.data["id"].nil?.should be false
     end
 
+    it 'can get user account image' do
+      response = config.client.account_logo
+      response.successful?.should be true
+      response.data['data']['height'].should eq 200
+    end
+
     it "can get a list of a users's albums" do
       response = config.client.albums
       response.successful?.should be true
@@ -78,6 +84,21 @@ describe FacebookClient do
       response.data["id"].nil?.should be false
     end
 
+    it 'can get locations' do
+      token_response = config.client.page_access_token(config.settings["page_id"])
+      access_token = token_response.data["access_token"]
+      location_fields = 'id, name, name_with_location_descriptor, username, picture, access_token, category, link, location, parent_page'
+      response = config.client.locations(fields: location_fields, limit: 1000, access_token: access_token)
+      response.successful?.should be true
+    end
+
+    # TODO: write ticket to work on figuring out how to test it on voyager
+    xit 'can get company info' do
+      token_response = config.client.page_access_token(config.settings["page_id"])
+      access_token = token_response.data["access_token"]
+      response = config.client.company_info('/2432345', fields: 'id, name, name_with_location_descriptor, username, picture, access_token, category, link, location', access_token: access_token)
+      response.successful?.should be true
+    end
   end
 
   context "with invalid Facebook credentials" do

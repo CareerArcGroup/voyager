@@ -106,9 +106,9 @@ module Voyager
       post("/#{edge}/feed", options)
     end
 
-    # def company_info(id, options = {})
-    #   get("/#{id}", options)
-    # end
+    def company_info(id, options = {})
+      get("/#{id}", options)
+    end
 
     # ============================================================================
     # Facebook Jobs Methods

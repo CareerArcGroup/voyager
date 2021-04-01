@@ -92,12 +92,12 @@ describe FacebookClient do
       response.successful?.should be true
     end
 
-    # TODO: write ticket to work on figuring out how to test it on voyager
-    xit 'can get company info' do
+    it 'can get company info' do
       token_response = config.client.page_access_token(config.settings["page_id"])
       access_token = token_response.data["access_token"]
-      response = config.client.company_info('/2432345', fields: 'id, name, name_with_location_descriptor, username, picture, access_token, category, link, location', access_token: access_token)
+      response = config.client.company_info(config.settings["page_id"], fields: 'id, name, name_with_location_descriptor, username, picture, access_token, category, link, location', access_token: access_token)
       response.successful?.should be true
+      response.data["id"].should eq(config.settings["page_id"].to_s)
     end
   end
 

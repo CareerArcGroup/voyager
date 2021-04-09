@@ -183,6 +183,22 @@ module Voyager
       get("/statuses/user_timeline.json", options)
     end
 
+    # ============================================================================
+    # V2 API Metrics Methods - These act on Tweets
+    # ============================================================================
+
+    def follower_count(user_id, options = {})
+      get("/users/#{user_id}", options)
+    end
+
+    def v2_recent_tweets(options = {})
+     get('/tweets/search/recent', options)
+    end
+
+    def bulk_metrics(options = {})
+      get('/tweets', options)
+    end
+
     alias :update :tweet
     alias :update_with_media :tweet_with_media
     alias :status_destroy :un_tweet

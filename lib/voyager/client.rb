@@ -50,11 +50,11 @@ module Voyager
     # Simple HTTP methods
     # ============================================================================
 
-    def get(path, params={})
-      perform_request(:get, uri_with_query(path, params))
+    def get(path, params={}, headers={})
+      perform_request(:get, uri_with_query(path, params), '', headers)
     end
 
-    def post(path, body='')
+    def post(path, body='', headers={})
       update_runtime_terms(body) if body.is_a?(Hash)
       perform_request(:post, path, body)
     end
@@ -94,7 +94,7 @@ module Voyager
     def build_request(request)
       http_request = case request.method
         when :get
-          Net::HTTP::Get.new(request.uri.to_s)
+          Net::HTTP::Get.new(request.uri.path)
         when :post
           multipart?(request.body) ?
             Net::HTTP::Post::Multipart.new(request.uri.path, to_multipart_params(request.body)) :

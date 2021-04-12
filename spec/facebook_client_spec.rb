@@ -23,6 +23,12 @@ describe FacebookClient do
       response.data["id"].nil?.should be false
     end
 
+    it 'can get user account image' do
+      response = config.client.account_logo
+      response.successful?.should be true
+      response.data['data']['height'].should eq 200
+    end
+
     it "can get a list of a users's albums" do
       response = config.client.albums
       response.successful?.should be true
@@ -78,6 +84,21 @@ describe FacebookClient do
       response.data["id"].nil?.should be false
     end
 
+    it 'can get locations' do
+      token_response = config.client.page_access_token(config.settings["page_id"])
+      access_token = token_response.data["access_token"]
+      location_fields = 'id, name, name_with_location_descriptor, username, picture, access_token, category, link, location, parent_page'
+      response = config.client.locations(fields: location_fields, limit: 1000, access_token: access_token)
+      response.successful?.should be true
+    end
+
+    it 'can get company info' do
+      token_response = config.client.page_access_token(config.settings["page_id"])
+      access_token = token_response.data["access_token"]
+      response = config.client.company_info(config.settings["page_id"], fields: 'id, name, name_with_location_descriptor, username, picture, access_token, category, link, location', access_token: access_token)
+      response.successful?.should be true
+      response.data["id"].should eq(config.settings["page_id"].to_s)
+    end
   end
 
   context "with invalid Facebook credentials" do

@@ -121,7 +121,7 @@ module Voyager
         'X-Restli-Protocol-Version' => '2.0.0'
       }
 
-      super(headers.reverse_merge(additional_headers))
+      super(additional_headers.merge(headers))
     end
 
     def transform_body(body)

@@ -92,6 +92,7 @@ module Voyager
     # build the HTTP request object, depending
     # on the method and the content (handle multi-part POSTs)...
     def build_request(request)
+      binding.pry
       http_request = case request.method
         when :get
           Net::HTTP::Get.new(request.uri.to_s)

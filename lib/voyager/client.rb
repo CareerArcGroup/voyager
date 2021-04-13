@@ -94,7 +94,7 @@ module Voyager
     def build_request(request)
       http_request = case request.method
         when :get
-          Net::HTTP::Get.new(request.uri.path)
+          Net::HTTP::Get.new(request.uri.to_s)
         when :post
           multipart?(request.body) ?
             Net::HTTP::Post::Multipart.new(request.uri.path, to_multipart_params(request.body)) :

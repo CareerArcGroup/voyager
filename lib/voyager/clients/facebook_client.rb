@@ -168,6 +168,18 @@ module Voyager
       post("/#{page_id}/tabs", options)
     end
 
+    # ============================================================================
+    # Metrics
+    # ============================================================================
+
+    def insights(object_id = 'me', options = {})
+      get("/#{object_id}/insights", options)
+    end
+
+    def feed(options = {})
+      get('/me/feed', options)
+    end
+
     protected
 
     def extract_edge!(options = {})

@@ -177,7 +177,7 @@ module Voyager
     end
 
     def feed(options = {})
-      get("/me/feed", options)
+      get('/me/feed', options)
     end
 
     protected

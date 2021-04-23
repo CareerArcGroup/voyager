@@ -56,7 +56,7 @@ module Voyager
 
     def post(path, body='', headers={})
       update_runtime_terms(body) if body.is_a?(Hash)
-      perform_request(:post, path, body)
+      perform_request(:post, path, body, headers)
     end
 
     # ============================================================================
@@ -99,7 +99,7 @@ module Voyager
           multipart?(request.body) ?
             Net::HTTP::Post::Multipart.new(request.uri.path, to_multipart_params(request.body)) :
             Net::HTTP::Post.new(request.uri.path).tap do |req|
-              req["Content-Type"] ||= "application/x-www-form-urlencoded"
+              req['Content-Type'] ||= (request.headers['Content-Type'] || 'application/x-www-form-urlencoded')
               req.body = transform_body(request.body)
             end
         else

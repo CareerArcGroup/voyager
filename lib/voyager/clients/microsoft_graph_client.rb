@@ -39,6 +39,10 @@ module Voyager
       get('/me', select: fields)
     end
 
+    def search(options = {})
+      post('/search/query', options[:body], options[:headers])
+    end
+
     # ============================================================================
     # Files
     # ============================================================================
@@ -51,7 +55,7 @@ module Voyager
       get('/me/drive')
     end
 
-    def drive_items(item_id = 'root', options = {})
+    def my_drive_items(item_id = 'root', options = {})
       get("/me/drive/#{item_id}/children", options)
     end
 
@@ -59,6 +63,10 @@ module Voyager
       drive_ids.map do |drive_id|
         get("/drives/#{drive_id}/root/children")
       end
+    end
+
+    def drive_item(drive_id = '/me/drives', item_id = '', options = {})
+      get("#{drive_id}/#{item_id}#{options[:expansions]}")
     end
 
     # ============================================================================
@@ -84,6 +92,15 @@ module Voyager
     end
 
     protected
+
+    def add_standard_headers(headers = {})
+      additional_headers = {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json',
+      }
+
+      super(additional_headers.merge(headers))
+    end
 
     def get(path, params = {})
       super(path + build_query(params))

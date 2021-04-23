@@ -20,6 +20,10 @@ describe MicrosoftGraphClient do
     expect(query['redirect_uri']).to eq('https://example.com/callback')
   end
 
+  before do
+    config.client.refresh!
+  end
+
   context 'with valid credentials' do
     it 'is authorized' do
       expect(config.client).to be_authorized
@@ -31,6 +35,21 @@ describe MicrosoftGraphClient do
 
         expect(response).to be_successful
         expect(response.data['userPrincipalName']).not_to be_nil
+      end
+    end
+
+    describe '#search' do
+      it 'queries the search API' do
+        config.client.refresh!
+        body = {:requests=>[{:entityTypes=>["drive"], :query=>{:queryString=>"careerarc"}}]}
+        response = config.client.search(body: body)
+
+        hits = response.data['value'].first['hitsContainers'].first['hits']
+        types = hits.map { |h| h.dig('resource', '@odata.type') }.uniq
+
+        expect(response).to be_successful
+        expect(hits.empty?).to be false
+        expect(types.all?{|t| t == '#microsoft.graph.drive'}).to be true
       end
     end
 

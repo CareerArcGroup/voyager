@@ -66,7 +66,7 @@ module Voyager
     end
 
     def drive_item(drive_id = '/me/drives', item_id = '', options = {})
-      get("#{drive_id}/#{item_id}#{options[:expansions]}")
+      get("/drives/#{drive_id}/items/#{item_id}#{options[:expansions]}")
     end
 
     # ============================================================================

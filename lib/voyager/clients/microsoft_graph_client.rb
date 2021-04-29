@@ -40,7 +40,7 @@ module Voyager
     end
 
     def search(options = {})
-      post('/search/query', options[:body], options[:headers])
+      post('/search/query', options[:body], options[:headers] || {})
     end
 
     # ============================================================================

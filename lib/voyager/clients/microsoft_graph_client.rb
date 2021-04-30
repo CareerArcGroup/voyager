@@ -47,11 +47,11 @@ module Voyager
     # Files
     # ============================================================================
 
-    def drives
+    def my_drives
       get('/me/drives')
     end
 
-    def drive
+    def my_drive
       get('/me/drive')
     end
 
@@ -59,36 +59,12 @@ module Voyager
       get("/me/drive/#{item_id}/children", options)
     end
 
-    def drive_children(drive_ids)
-      drive_ids.map do |drive_id|
-        get("/drives/#{drive_id}/root/children")
-      end
+    def drive(drive_id, options)
+      get("/drives/#{drive_id}" + "#{options[:query_opts].presence}")
     end
 
-    def drive_item(drive_id = '/me/drives', item_id = '', options = {})
-      get("/drives/#{drive_id}/items/#{item_id}#{options[:expansions]}")
-    end
-
-    # ============================================================================
-    # Sites
-    # ============================================================================
-
-    def site_root
-      get('/sites/root')
-    end
-
-    def sub_sites(site_id)
-      get("/sites/#{site_id}/sites")
-    end
-
-    def followed_sites
-      get('/me/followedSites')
-    end
-
-    def site_drives(site_ids)
-      site_ids.map do |site_id|
-        get("/sites/#{site_id}/drives")
-      end
+    def drive_item(drive_id, item_id, options = {})
+      get("/drives/#{drive_id}/items/#{item_id}" + "#{options[:expansions].presence}")
     end
 
     protected

@@ -67,6 +67,14 @@ module Voyager
       get("/drives/#{drive_id}/items/#{item_id}" + "#{query_opts.presence}")
     end
 
+    def list(site_id, list_id, query_opts = '')
+      get("/sites/#{site_id}/lists/#{list_id}" + query_opts)
+    end
+
+    def list_item(site_id, list_id, item_id, query_opts = '')
+      get("/sites/#{site_id}/lists/#{list_id}/items/#{item_id}" + query_opts)
+    end
+
     protected
 
     def add_standard_headers(headers = {})

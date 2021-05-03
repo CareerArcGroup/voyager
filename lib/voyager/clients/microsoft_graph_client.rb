@@ -59,11 +59,11 @@ module Voyager
       get("/me/drive/#{item_id}/children", options)
     end
 
-    def drive(drive_id:, query_opts: {})
+    def drive(drive_id, query_opts = '')
       get("/drives/#{drive_id}" + "#{query_opts.presence}")
     end
 
-    def drive_item(drive_id:, item_id:, query_opts: {})
+    def drive_item(drive_id, item_id, query_opts = '')
       get("/drives/#{drive_id}/items/#{item_id}" + "#{query_opts.presence}")
     end
 

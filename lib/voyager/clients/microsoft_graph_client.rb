@@ -55,16 +55,16 @@ module Voyager
       get('/me/drive')
     end
 
-    def my_drive_items(item_id = 'root', options)
-      get("/me/drive/#{item_id}/children", options)
+    def my_drive_items(item_id = 'root', options = '')
+      get("/me/drive/#{item_id}/children" + options)
     end
 
     def drive(drive_id, query_opts = '')
-      get("/drives/#{drive_id}" + "#{query_opts.presence}")
+      get("/drives/#{drive_id}" + query_opts)
     end
 
     def drive_item(drive_id, item_id, query_opts = '')
-      get("/drives/#{drive_id}/items/#{item_id}" + "#{query_opts.presence}")
+      get("/drives/#{drive_id}/items/#{item_id}" + query_opts)
     end
 
     def list(site_id, list_id, query_opts = '')

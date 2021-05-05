@@ -24,6 +24,29 @@ describe MicrosoftGraphClient do
     config.client.refresh!
   end
 
+  let(:search_body) do
+    { "requests": [{ "entityTypes": ["driveItem"], "query": { "queryString": "CareerArc" }}] }
+  end
+
+  let(:search_data) { config.client.search(body: search_body).data }
+  let(:search_hits) { search_data['value'].first['hitsContainers'].first['hits'] }
+  let(:drive_item)  { search_hits.first['resource'] }
+  let(:drive_item_ids) do
+    {
+      drive_id: drive_item.dig('parentReference', 'driveId'),
+      item_id: drive_item['id']
+    }
+  end
+
+  let(:sharepoint_ids) do
+    all_sharepoint = drive_item.dig('parentReference', 'sharepointIds')
+    {
+      site_id: drive_item.dig('parentReference', 'siteId'),
+      list_id: all_sharepoint['listId'],
+      item_id: all_sharepoint['listItemUniqueId']
+    }
+  end
+
   context 'with valid credentials' do
     it 'is authorized' do
       expect(config.client).to be_authorized
@@ -53,27 +76,27 @@ describe MicrosoftGraphClient do
       end
     end
 
-    describe '#drives' do
+    describe '#my_drives' do
       it 'returns a list of drives the user has access to' do
-        response = config.client.drives
+        response = config.client.my_drives
 
         expect(response).to be_successful
         expect(response.data['value'].count { |drive| drive['name'] == 'OneDrive'}).to eq(1)
       end
     end
 
-    describe '#drive' do
+    describe '#my_drive' do
       it 'returns the user\'s OneDrive drive' do
-        response = config.client.drive
+        response = config.client.my_drive
 
         expect(response).to be_successful
         expect(response.data['name']).to eq('OneDrive')
       end
     end
 
-    describe '#drive_items' do
+    describe '#my_drive_items' do
       it 'returns items within the user\'s OneDrive drive' do
-        response = config.client.drive_items
+        response = config.client.my_drive_items
 
         expect(response).to be_successful
 
@@ -83,40 +106,60 @@ describe MicrosoftGraphClient do
       end
     end
 
-    describe '#site_root' do
-      it 'returns the root info of the user\'s Sharepoint site' do
-        response = config.client.site_root
+    describe '#drive' do
+      it 'returns a list of a given drive\'s contents' do
+        response = config.client.drive(drive_item_ids[:drive_id])
 
-        expect(response.data['displayName']).not_to be_empty
+        expect(response).to be_successful
+        expect(response.data['id']).to eq(drive_item_ids[:drive_id])
+      end
+
+      it 'appends expansions and select options if given' do
+        response = config.client.drive(drive_item_ids[:drive_id], '?expand=list')
+
+        expect(response).to be_successful
+        expect(response.data['list']).not_to be_empty
       end
     end
 
-    describe '#sub_sites' do
-      it 'returns a collection of the root site\'s sub_sites' do
-        root = config.client.site_root
-        root_id = root.data['id']
-        response = config.client.sub_sites(root_id)
+    describe '#drive_item' do
+      it 'queries a particular item in a given drive' do
+        response = config.client.drive_item(drive_item_ids[:drive_id], drive_item_ids[:item_id])
 
-        expect(response.data['value'].map { |site| site['name'] }).not_to be_empty
+        expect(response).to be_successful
+        expect(response.data.dig('parentReference', 'driveId')).to eq drive_item_ids[:drive_id]
+      end
+
+      it 'returns expanded and selected fields if given' do
+        response = config.client.drive_item(drive_item_ids[:drive_id], drive_item_ids[:item_id], '?expand=thumbnails')
+
+        expect(response).to be_successful
+        expect(response.data.member?('thumbnails')).to be true
       end
     end
 
-    describe '#followed_sites' do
-      it 'returns a collection of sites followed by the authed user' do
-        response = config.client.followed_sites
+    describe '#list' do
+      it 'returns a given list\'s data, given a site_id' do
+        response = config.client.list(sharepoint_ids[:site_id], sharepoint_ids[:list_id])
 
-        expect(response.data['value']).not_to be_empty
+        expect(response).to be_successful
+      end
+
+      it 'returns expanded and selected fields if given' do
+        response = config.client.list(sharepoint_ids[:site_id], sharepoint_ids[:list_id], '?expand=items')
+
+        expect(response).to be_successful
+        expect(response.data.member?('items')).to be true
       end
     end
 
-    describe '#site_drives' do
-      it 'returns a collection of drives connected to a given site' do
-        sites = config.client.followed_sites
-        site_ids = sites.data['value'].map { |v| v['id'] }
-        response = config.client.site_drives(site_ids)
-        drive_type = response.map{|obj| obj.data['value'].map{|v| v['driveType']}}.flatten.compact
+    describe '#list_item' do
+      it 'returns a particular item in a given list' do
+        args = [sharepoint_ids[:site_id], sharepoint_ids[:list_id], sharepoint_ids[:item_id]]
+        response = config.client.list_item(*args)
 
-        expect(drive_type).not_to be_empty
+        expect(response).to be_successful
+        expect(response.data['fields']).not_to be_empty
       end
     end
   end

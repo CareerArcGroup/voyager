@@ -67,6 +67,10 @@ module Voyager
       get("/drives/#{drive_id}/items/#{item_id}" + "#{query_opts.presence}")
     end
 
+    def download_drive_item(drive_id, item_id)
+      get("/drives/#{drive_id}/items/#{item_id}/content")
+    end
+
     def list(site_id, list_id, query_opts = '')
       get("/sites/#{site_id}/lists/#{list_id}" + query_opts)
     end

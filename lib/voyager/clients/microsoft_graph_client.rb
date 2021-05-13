@@ -105,7 +105,7 @@ module Voyager
       uri = super
       # LinkedIn with X-Restli-Protocol-Version 2.0.0 requires these characters
       # to be unescaped
-      uri.gsub('+', ' ').uri.gsub('%28', '(').gsub('%29', ')').gsub('%2C', ',')
+      uri.gsub('%28', '(').gsub('%29', ')').gsub('%2C', ',').gsub('%24', '$').gsub('+', ' ')
     end
 
     def transform_body(body)

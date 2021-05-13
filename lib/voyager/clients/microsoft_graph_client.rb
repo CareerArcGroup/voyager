@@ -77,15 +77,6 @@ module Voyager
 
     protected
 
-    def add_standard_headers(headers = {})
-      additional_headers = {
-        'Accept' => 'application/json',
-        'Content-Type' => 'application/json',
-      }
-
-      super(additional_headers.merge(headers))
-    end
-
     def get(path, params = {})
       super(path + build_query(params))
     end
@@ -99,6 +90,22 @@ module Voyager
 
     def build_query_value(value)
       value.is_a?(Array) ? value.join(',') : value.to_s
+    end
+
+    def add_standard_headers(headers = {})
+      additional_headers = {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json',
+      }
+
+      super(additional_headers.merge(headers))
+    end
+
+    def uri_with_query(url, query={})
+      uri = super
+      # LinkedIn with X-Restli-Protocol-Version 2.0.0 requires these characters
+      # to be unescaped
+      uri.gsub('%28', '(').gsub('%29', ')').gsub('%2C', ',')
     end
 
     def transform_body(body)

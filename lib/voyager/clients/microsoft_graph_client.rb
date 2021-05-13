@@ -103,12 +103,10 @@ module Voyager
 
     def uri_with_query(url, query={})
       uri = super
-      # LinkedIn with X-Restli-Protocol-Version 2.0.0 requires these characters
-      # to be unescaped
-      binding.pry
+      # Microsoft Graph API requires that parentheses in the path segment
+      # (search(q='<queryterm>')) be unescaped, but not further parens -- say in
+      # a nested select (expand=thumbnails($select=medium)).
       uri.gsub(/\%28/, '(').gsub(/\%29/, ')').chomp('?')
-
-      # uri.gsub('%28', '(').gsub('%29', ')').gsub('%2C', ',').gsub('%24', '$').chomp('?')
     end
 
     def transform_body(body)

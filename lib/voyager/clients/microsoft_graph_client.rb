@@ -39,51 +39,52 @@ module Voyager
       get('/me', select: fields)
     end
 
+    def search(options = {})
+      post('/search/query', options[:body], options[:headers] || {})
+    end
+
     # ============================================================================
     # Files
     # ============================================================================
 
-    def drives
+    def my_drives
       get('/me/drives')
     end
 
-    def drive
+    def my_drive
       get('/me/drive')
     end
 
-    def drive_items(item_id = 'root', options = {})
-      get("/me/drive/#{item_id}/children", options)
+    def my_drive_items(item_id = 'root', options = '')
+      get("/me/drive/#{item_id}/children" + options)
     end
 
-    def drive_children(drive_ids)
-      drive_ids.map do |drive_id|
-        get("/drives/#{drive_id}/root/children")
-      end
+    def drive(drive_id, query_opts = '')
+      get("/drives/#{drive_id}" + query_opts)
     end
 
-    # ============================================================================
-    # Sites
-    # ============================================================================
-
-    def site_root
-      get('/sites/root')
+    def drive_item(drive_id, item_id, query_opts = '')
+      get("/drives/#{drive_id}/items/#{item_id}" + query_opts)
     end
 
-    def sub_sites(site_id)
-      get("/sites/#{site_id}/sites")
+    def list(site_id, list_id, query_opts = '')
+      get("/sites/#{site_id}/lists/#{list_id}" + query_opts)
     end
 
-    def followed_sites
-      get('/me/followedSites')
-    end
-
-    def site_drives(site_ids)
-      site_ids.map do |site_id|
-        get("/sites/#{site_id}/drives")
-      end
+    def list_item(site_id, list_id, item_id, query_opts = '')
+      get("/sites/#{site_id}/lists/#{list_id}/items/#{item_id}" + query_opts)
     end
 
     protected
+
+    def add_standard_headers(headers = {})
+      additional_headers = {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json',
+      }
+
+      super(additional_headers.merge(headers))
+    end
 
     def get(path, params = {})
       super(path + build_query(params))

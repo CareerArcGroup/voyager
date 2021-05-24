@@ -109,7 +109,7 @@ module Voyager
     def video(options = {})
       edge = extract_edge!(options)
 
-      post("/#{edge}/video", options)
+      post("/#{edge}/videos", options)
     end
 
     def company_info(id, options = {})

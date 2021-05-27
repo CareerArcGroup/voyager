@@ -5,7 +5,7 @@ module Voyager
 
     def self.parse_response(response, data)
       super(response, data)
-
+data.kind_of?(Net::HTTPSuccess)
       # handle the case of the empty or missing response...
       return if data.nil? || !data.kind_of?(Net::HTTPResponse)
 

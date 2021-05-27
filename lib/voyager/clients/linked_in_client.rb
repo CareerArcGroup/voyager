@@ -50,13 +50,15 @@ module Voyager
     end
 
     def upload(url, opts={})
-      %x{
+      resp = %x{
         curl -iv --upload-file \
           \"#{Voyager::Util.upload_from(opts[:source]).local_path}\" \
           \"#{URI(url)}\" \
           -H "Authorization: Bearer #{token}" \
           -H 'X-Restli-Protocol-Version: 2.0.0'
       }
+
+      Voyager::Response.new(opts[:id], resp, response_parser)
     end
 
     # ============================================================================

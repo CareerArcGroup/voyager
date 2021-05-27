@@ -148,6 +148,10 @@ module Voyager
       super(additional_headers.merge(headers))
     end
 
+    # override Client method; some PUT endpoints require inclusion of query
+    # string, Client drops this, using request.api.path instead.
+    # Opportunity for refactor to separate out request types, minimize
+    # necessary overrides.
     def build_request(request)
       http_request = case request.method
         when :get

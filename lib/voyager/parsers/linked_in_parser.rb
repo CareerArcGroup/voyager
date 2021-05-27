@@ -5,7 +5,7 @@ module Voyager
 
     def self.parse_response(response, data)
       super(response, data)
-data.kind_of?(Net::HTTPSuccess)
+      binding.pry
       # handle the case of the empty or missing response...
       return if data.nil? || !data.kind_of?(Net::HTTPResponse)
 
@@ -19,7 +19,7 @@ data.kind_of?(Net::HTTPSuccess)
 
         # errors can be detected by the status code (not Success) or
         # by the presence of an "errors" object in the de-serialized response...
-        response.successful = (data.kind_of?(Net::HTTPSuccess) && response.errors.nil?)
+        response.successful = (data.kind_of?(Net::HTTPSuccess) && response.errors.nil?) || data.lines.match?(/(?<protocol>^HTTP\S+)\s(?<success>201)/)
 
         # check for rate-limited response
         # https://developer.linkedin.com/docs/guide/v2/error-handling

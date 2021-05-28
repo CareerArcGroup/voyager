@@ -164,11 +164,6 @@ module Voyager
       post("/statuses/update.json", options.merge(status: message))
     end
 
-    # Tweets with a picture :-)
-    def tweet_with_media(message, image, options = {})
-      post("/statuses/update_with_media.json", options.merge(:status => message, :'media[]' => image))
-    end
-
     # Destroys the status specified by the required ID parameter. The authenticating user must
     # be the author of the specified status. Returns the destroyed status if successful.
     def un_tweet(tweet_id)
@@ -209,7 +204,6 @@ module Voyager
     end
 
     alias :update :tweet
-    alias :update_with_media :tweet_with_media
     alias :status_destroy :un_tweet
     alias :user_timeline :recent_tweets
 

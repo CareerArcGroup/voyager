@@ -199,6 +199,15 @@ module Voyager
       get('/tweets', options)
     end
 
+    def upload_media(image_url)
+      upload_io = Voyager::Util.upload_from(image_url)
+      encoded = Base64.encode64(File.read(upload_io))
+
+      with_site('https://upload.twitter.com') do
+        post('/media/upload.json', media_data: encoded)
+      end
+    end
+
     alias :update :tweet
     alias :update_with_media :tweet_with_media
     alias :status_destroy :un_tweet

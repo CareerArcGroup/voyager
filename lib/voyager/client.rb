@@ -154,6 +154,17 @@ module Voyager
       body
     end
 
+    def with_site(site, &block)
+      original_site = options[:site]
+      options[:site] = site
+
+      begin
+        yield
+      ensure
+        options[:site] = original_site
+      end
+    end
+
     # ============================================================================
     # Response handling
     # ============================================================================

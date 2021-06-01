@@ -154,10 +154,10 @@ module Voyager
       body
     end
 
-    def with_site(site, &block)
+    def with_site(new_site, &block)
       original_site = options[:site]
-      options[:site] = site
-
+      options[:site] = new_site
+s
       begin
         yield
       ensure

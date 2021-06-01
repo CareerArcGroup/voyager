@@ -151,30 +151,6 @@ module Voyager
       super(additional_headers.merge(headers))
     end
 
-    # override Client method; some PUT endpoints require inclusion of query
-    # string, Client drops this, using request.api.path instead.
-    # Opportunity for refactor to separate out request types, minimize
-    # necessary overrides.
-    def build_request(request)
-      http_request = case request.method
-        when :get
-          Net::HTTP::Get.new(request.uri.request_uri)
-        when :post
-          multipart?(request.body) ?
-            Net::HTTP::Post::Multipart.new(request.uri.path, to_multipart_params(request.body)) :
-            Net::HTTP::Post.new(request.uri).tap do |req|
-              req['Content-Type'] ||= (request.headers['Content-Type'] || 'application/x-www-form-urlencoded')
-              req.body = transform_body(request.body)
-            end
-        else
-          raise ArgumentError, "Unsupported method '#{request.method}'"
-        end
-
-      request.headers.each { |key,value| http_request[key] = value }
-      access_token.headers.each { |key, value| http_request[key] = value }
-      http_request
-    end
-
     def transform_body(body)
       JSON.unparse(body)
     end

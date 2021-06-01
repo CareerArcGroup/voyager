@@ -92,13 +92,14 @@ module Voyager
     # build the HTTP request object, depending
     # on the method and the content (handle multi-part POSTs)...
     def build_request(request)
+      request_uri = request.uri.request_uri
       http_request = case request.method
         when :get
-          Net::HTTP::Get.new(request.uri.request_uri)
+          Net::HTTP::Get.new(request_uri)
         when :post
           multipart?(request.body) ?
-            Net::HTTP::Post::Multipart.new(request.uri.path, to_multipart_params(request.body)) :
-            Net::HTTP::Post.new(request.uri.path).tap do |req|
+            Net::HTTP::Post::Multipart.new(request_uri, to_multipart_params(request.body)) :
+            Net::HTTP::Post.new(request_uri).tap do |req|
               req['Content-Type'] ||= (request.headers['Content-Type'] || 'application/x-www-form-urlencoded')
               req.body = transform_body(request.body)
             end

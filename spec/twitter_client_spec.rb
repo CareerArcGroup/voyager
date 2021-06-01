@@ -49,20 +49,6 @@ describe TwitterClient do
       response.data["id"].nil?.should be false
     end
 
-    it "can tweet with media" do
-      banner = File.new(File.expand_path("../assets/profile_banner.jpg", __FILE__))
-      response = config.client.tweet_with_media("Hello world from dimension #{rand(9999) + 1}", banner)
-      response.should be_successful
-    end
-
-    it "can tweet with media from remote url" do
-      require 'open-uri'
-      url = "http://staging-careerarc-com.s3.amazonaws.com/test/twitter_card.jpg"
-      media = open(url)
-      response = config.client.tweet_with_media("Media with remote url #{rand(9999) + 1}", media)
-      response.should be_successful
-    end
-
     it "can un-tweet" do
       account_info = config.client.account_info.data
       last_tweet_id = account_info["status"]["id"]
@@ -144,6 +130,14 @@ describe TwitterClient do
       response.should be_successful
       response.data["ids"].should be_a_kind_of Array
       response.data["ids"].size.should be > 0
+    end
+
+    it "can upload media" do
+      url = "http://staging-careerarc-com.s3.amazonaws.com/test/twitter_card.jpg"
+      response = config.client.upload_media(url)
+      response.should be_successful
+      response.data['media_id'].should be_a_kind_of Numeric
+      response.data['media_id_string'].should be_a_kind_of String
     end
 
   end

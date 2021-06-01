@@ -4,6 +4,25 @@ include Voyager
 
 LINKEDIN_TEST_COMPANY_ID = 2414183
 LINKEDIN_TEST_COMPANY_URN = "urn:li:organization:2414183"
+LINKEDIN_SHARES_PROFILE_ID = 'eI2ganNkL9'
+LINKEDIN_SHARES_PROFILE_URN = 'urn:li:person:eI2ganNkL9'
+
+register_upload_opts = {
+  registerUploadRequest: {
+    owner: LINKEDIN_SHARES_PROFILE_URN,
+    recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
+    serviceRelationships: [
+      {
+        identifier: 'urn:li:userGeneratedContent',
+        relationshipType: 'GENERIC'
+      }
+    ],
+    supportedUploadMechanism: [
+      'SYNCHRONOUS_UPLOAD'
+    ]
+  }
+}
+
 
 
 config = SpecHelper::Config.new(Voyager::LinkedInClient)
@@ -57,6 +76,21 @@ describe LinkedInClient do
       response = config.client.company_info(LINKEDIN_TEST_COMPANY_ID)
       response.successful?.should be true
       response.data["id"].nil?.should be false
+    end
+
+    it 'can register an upload' do
+      response = config.client.register_upload(register_upload_opts)
+      expect(response).to be_successful
+      expect(response.dig('value', 'asset')). to match(/urn\:li\:digitalmediaAsset\:\S+/)
+    end
+
+    it 'can upload images' do
+      register = config.client.register_upload(register_upload_opts)
+      upload_url = register.data.dig('value', 'uploadMechanism', 'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest', 'uploadUrl')
+      source = 'https://www.sciencemag.org/sites/default/files/styles/inline__450w__no_aspect/public/dogs_1280p_0.jpg'
+
+      response = config.client.upload(upload_url, source: source)
+      expect(response.raw_response).to match(/^HTTP\S+\s2[0-9]{2}/)
     end
   end
 

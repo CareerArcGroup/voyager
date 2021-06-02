@@ -4,6 +4,25 @@ include Voyager
 
 LINKEDIN_TEST_COMPANY_ID = 2414183
 LINKEDIN_TEST_COMPANY_URN = "urn:li:organization:2414183"
+LINKEDIN_SHARES_PROFILE_ID = 'eI2ganNkL9'
+LINKEDIN_SHARES_PROFILE_URN = 'urn:li:person:eI2ganNkL9'
+
+register_upload_opts = {
+  registerUploadRequest: {
+    owner: LINKEDIN_SHARES_PROFILE_URN,
+    recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
+    serviceRelationships: [
+      {
+        identifier: 'urn:li:userGeneratedContent',
+        relationshipType: 'GENERIC'
+      }
+    ],
+    supportedUploadMechanism: [
+      'SYNCHRONOUS_UPLOAD'
+    ]
+  }
+}
+
 
 
 config = SpecHelper::Config.new(Voyager::LinkedInClient)
@@ -26,21 +45,49 @@ describe LinkedInClient do
       response.data["id"].nil?.should be false
     end
 
-    it "can share" do
+    it "can get company info" do
+      response = config.client.company_info(LINKEDIN_TEST_COMPANY_ID)
+      response.successful?.should be true
+      response.data["id"].nil?.should be false
+    end
+
+    it 'can register an upload' do
+      response = config.client.register_upload(register_upload_opts)
+      expect(response).to be_successful
+      expect(response.dig('value', 'asset')). to match(/urn\:li\:digitalmediaAsset\:\S+/)
+    end
+
+    it 'can upload images' do
+      register = config.client.register_upload(register_upload_opts)
+      upload_url = register.data.dig('value', 'uploadMechanism', 'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest', 'uploadUrl')
+      source = 'https://www.sciencemag.org/sites/default/files/styles/inline__450w__no_aspect/public/dogs_1280p_0.jpg'
+
+      response = config.client.upload(upload_url, Voyager::Util.upload_from(source))
+      expect(response).to be_successful
+    end
+
+    it "can share with images" do
+      img_url = 'https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2020/02/322868_1100-1100x628.jpg'
+      register = config.client.register_upload(register_upload_opts)
+      upload_url = register.dig('value', 'uploadMechanism', 'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest', 'uploadUrl')
+      asset_urn = register.dig('value', 'asset')
+      config.client.upload(upload_url, Voyager::Util.upload_from(img_url))
+
       response = config.client.share(
         {
           content: {
             contentEntities: [
               {
-                entityLocation: "http://www.google.com"
+                entity: asset_urn
               }
             ],
-            title: "Test Share with Content"
+            title: "Test Share with Content",
+            shareMediaCategory: 'IMAGE'
           },
           distribution: {
             "linkedInDistributionTarget": {}
           },
-          owner: LINKEDIN_TEST_COMPANY_URN,
+          owner: LINKEDIN_SHARES_PROFILE_URN,
           subject: "Test Share Subject",
           text: {
             text: "Hello World from dimension #{Random.rand(9999)+1}"
@@ -50,13 +97,6 @@ describe LinkedInClient do
 
       response.successful?.should be true
       response.data["activity"].nil?.should be false
-    end
-
-
-    it "can get company info" do
-      response = config.client.company_info(LINKEDIN_TEST_COMPANY_ID)
-      response.successful?.should be true
-      response.data["id"].nil?.should be false
     end
   end
 

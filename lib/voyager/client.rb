@@ -59,6 +59,11 @@ module Voyager
       perform_request(:post, path, body, headers)
     end
 
+    def put(path, body='', headers={})
+      update_runtime_terms(body) if body.is_a?(Hash)
+      perform_request(:put, path, body, headers)
+    end
+
     # ============================================================================
     # Core HTTP methods
     # ============================================================================
@@ -67,7 +72,7 @@ module Voyager
     def perform_request(method, path, body='', headers={})
       return Voyager::Response::Pretend.new if pretend?
 
-      uri     = URI.join(site, "#{path_prefix}#{path}")
+      uri     = path.start_with?('/') ? URI.join(site, "#{path_prefix}#{path}") : URI.parse(path)
       request = Voyager::Request.new(method, uri, body, add_standard_headers(headers))
       trace   = Voyager::Trace.begin(request, filtered_terms)
 
@@ -100,14 +105,28 @@ module Voyager
           multipart?(request.body) ?
             Net::HTTP::Post::Multipart.new(request_uri, to_multipart_params(request.body)) :
             Net::HTTP::Post.new(request_uri).tap do |req|
-              req['Content-Type'] ||= (request.headers['Content-Type'] || 'application/x-www-form-urlencoded')
               req.body = transform_body(request.body)
+            end
+        when :put
+           multipart?(request.body) ?
+            Net::HTTP::Put::Multipart.new(request_uri, to_multipart_params(request.body)) :
+            Net::HTTP::Put.new(request_uri).tap do |req|
+              if request.body.respond_to?(:to_io) || request.body.is_a?(UploadIO)
+                request.headers['Content-Type'] = Voyager::MIME.mime_type_for(request.body.path)
+                request.headers['Content-Length'] = request.body.size
+
+                req.body_stream = request.body
+              else
+                req.body = transform_body(request.body)
+              end
             end
         else
           raise ArgumentError, "Unsupported method '#{request.method}'"
         end
-
+      
+      request.headers['Content-Type'] = http_request['Content-Type'] if multipart?(request.body)
       request.headers.each { |key,value| http_request[key] = value }
+
       http_request
     end
 

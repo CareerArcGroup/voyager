@@ -105,6 +105,7 @@ module Voyager
           multipart?(request.body) ?
             Net::HTTP::Post::Multipart.new(request_uri, to_multipart_params(request.body)) :
             Net::HTTP::Post.new(request_uri).tap do |req|
+              req['Content-Type'] ||= (request.headers['Content-Type'] || 'application/x-www-form-urlencoded')
               req.body = transform_body(request.body)
             end
         when :put

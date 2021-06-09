@@ -85,12 +85,12 @@ describe MicrosoftGraphClient do
       end
     end
 
-    describe '#my_drive' do
+    describe '#my_drive_children' do
       it 'returns the user\'s OneDrive drive' do
-        response = config.client.my_drive
+        response = config.client.my_drive_children
 
         expect(response).to be_successful
-        expect(response.data['name']).to eq('OneDrive')
+        expect(response.data['value'].first['name']).not_to be_nil
       end
     end
 
@@ -103,6 +103,22 @@ describe MicrosoftGraphClient do
         # expects there to be at least one drive item in the connected account's OneDrive
         # if this fails, you may need to add a file/folder
         expect(response.data['value'].map { |drive_item| drive_item['name'] }).not_to be_empty
+      end
+    end
+
+    describe '#drive_following' do
+      it 'returns a list of drives the authed user follows' do
+        response = config.client.drive_following
+
+        expect(response).to be_successful
+      end
+    end
+
+    describe '#drive_shared' do
+      it 'returns a list of drives the authed user follows' do
+        response = config.client.drive_shared
+
+        expect(response).to be_successful
       end
     end
 
@@ -119,6 +135,15 @@ describe MicrosoftGraphClient do
 
         expect(response).to be_successful
         expect(response.data['list']).not_to be_empty
+      end
+    end
+
+    describe '#drive_children' do
+      it 'returns a list of children for a given drive' do
+        response = config.client.drive_children(drive_item_ids[:drive_id])
+
+        expect(response).to be_successful
+        expect(result = response.data['value'].first['name']).not_to be_nil
       end
     end
 

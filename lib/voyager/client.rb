@@ -124,7 +124,7 @@ module Voyager
         else
           raise ArgumentError, "Unsupported method '#{request.method}'"
         end
-      
+
       request.headers['Content-Type'] = http_request['Content-Type'] if multipart?(request.body)
       request.headers.each { |key,value| http_request[key] = value }
 
@@ -175,7 +175,7 @@ module Voyager
       body
     end
 
-    def with_site(new_site, &block)
+    def with_site(new_site)
       original_site = options[:site]
       options[:site] = new_site
 

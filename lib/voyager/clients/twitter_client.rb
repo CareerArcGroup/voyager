@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Voyager
   class TwitterClient < OAuthClient
@@ -203,9 +204,9 @@ module Voyager
       end
     end
 
-    alias :update :tweet
-    alias :status_destroy :un_tweet
-    alias :user_timeline :recent_tweets
+    alias update tweet
+    alias status_destroy un_tweet
+    alias user_timeline recent_tweets
 
     protected
 

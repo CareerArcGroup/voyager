@@ -4,6 +4,11 @@ module Voyager
   class TwitterClient < OAuthClient
 
     filtered_attributes :snipped_data
+    MAX_CHUNK_SIZE = 3*1024*1024
+    MEDIA_CATEGORIES = {
+      'image' => 'tweet_image',
+      'gif'   => 'tweet_gif'
+    }.freeze
 
     # ============================================================================
     # Client Initializers and Public Methods
@@ -13,6 +18,8 @@ module Voyager
       options[:site] ||= 'https://api.twitter.com'
       options[:authorize_path] ||= '/oauth/authenticate'
       options[:path_prefix] ||= '/1.1'
+      options[:upload_site] = 'https://upload.twitter.com'
+      options[:upload_endpoint] = '/media/upload.json'
 
       super(options)
     end
@@ -195,13 +202,81 @@ module Voyager
       get('/tweets', options)
     end
 
-    def upload_media(image_url)
-      upload_io = Voyager::Util.upload_from(image_url)
-      encoded = Base64.encode64(File.read(upload_io))
+    def upload_media(image_url, image_class)
+      io = Voyager::Util.upload_from(image_url)
+      tot_chunks = (io.size.to_f/MAX_CHUNK_SIZE).ceil
+      media_category = MEDIA_CATEGORIES[image_class]
 
-      with_site('https://upload.twitter.com') do
-        post('/media/upload.json', media_data: encoded)
+      init_resp = upload_init(io.size, io.content_type, media_category)
+      return init_resp unless init_resp.successful?
+
+      media_id = init_resp.data['media_id']
+
+      segment_index = 0
+      until (segment_index + 1) > tot_chunks
+        chunk = IO.binread(io, MAX_CHUNK_SIZE, (MAX_CHUNK_SIZE * segment_index))
+        append_resp = upload_append(media_id, chunk, segment_index)
+        return append_resp unless append_resp.successful?
+
+        segment_index +=1
       end
+
+      upload_finalize(media_id)
+    end
+
+    def upload_init(size, media_type, media_category)
+      init_opts = {
+        command: 'INIT',
+        total_bytes: size,
+        media_type: media_type,
+        media_category: media_category
+      }
+
+      with_site(upload_site) do
+        post(uri_with_query(upload_endpoint, init_opts))
+      end
+    end
+
+    def upload_append(media_id, chunk, index)
+      with_site(upload_site) do
+        post(
+         upload_endpoint,
+          {
+            command: 'APPEND',
+            media_id: media_id,
+            media_data: Base64.encode64(chunk),
+            segment_index: index
+          }
+        )
+      end
+    end
+
+    def upload_finalize(media_id)
+      with_site(upload_site) do
+        post(
+          uri_with_query(
+            upload_endpoint,
+            { command: 'FINALIZE', media_id: media_id }
+          )
+        )
+      end
+    end
+
+    def upload_status(media_id)
+      with_site(upload_site) do
+        get(
+          upload_endpoint,
+          { command: 'STATUS', media_id: media_id }
+        )
+      end
+    end
+
+    def upload_site
+      options[:upload_site]
+    end
+
+    def upload_endpoint
+      options[:upload_endpoint]
     end
 
     alias update tweet

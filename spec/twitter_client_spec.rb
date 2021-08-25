@@ -1,4 +1,3 @@
-
 require 'spec_helper'
 require 'yaml'
 include Voyager
@@ -132,12 +131,41 @@ describe TwitterClient do
       response.data["ids"].size.should be > 0
     end
 
-    it "can upload media" do
-      url = "http://staging-careerarc-com.s3.amazonaws.com/test/twitter_card.jpg"
-      response = config.client.upload_media(url)
-      response.should be_successful
-      response.data['media_id'].should be_a_kind_of Numeric
-      response.data['media_id_string'].should be_a_kind_of String
+    context "uploading_media" do
+      let(:url)    { "http://staging-careerarc-com.s3.amazonaws.com/test/twitter_card.jpg" }
+      let(:client) { config.client }
+
+      it 'can upload successfully' do
+        response = client.upload_media(url, 'image')
+        response.should be_successful
+
+        response.data['media_id'].should be_a_kind_of Numeric
+        response.data['media_id_string'].should be_a_kind_of String
+      end
+
+      it 'uses the chunked upload endpoint', :aggregate_failures do
+        allow(client).to receive(:upload_init).and_call_original
+        allow(client).to receive(:upload_append).with(any_args).and_call_original
+        allow(client).to receive(:upload_finalize).and_call_original
+
+        client.upload_media(url, 'image')
+
+        expect(client).to have_received(:upload_init)
+        expect(client).to have_received(:upload_append).exactly(:once)
+        expect(client).to have_received(:upload_finalize)
+      end
+
+      it 'can upload gifs over 5mb in size', :aggregate_failures do
+        big_gif_url = "http://staging-careerarc-com.s3.amazonaws.com/test/big_gif.gif"
+        allow(client).to receive(:upload_append).with(any_args).and_call_original
+
+        expect(client).to receive(:upload_append).exactly(2).times
+
+        response = client.upload_media(big_gif_url, 'gif')
+
+        response.should be_successful
+        expect(response.data.dig('processing_info', 'state')).not_to be_nil
+      end
     end
 
   end

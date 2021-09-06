@@ -18,10 +18,13 @@ module Voyager
       post('/insights/engagement/totals', params.to_json)
     end
 
-    def historical(start_date = 1.day.ago.to_date, end_date = 1.minute.ago.to_date, options = {})
+    def recent_engagement(options = {})
       params = default_historical_options.merge(options)
-      params[:start] = start_date.to_s
-      params[:end] = end_date.to_s
+      post('/insights/engagement/28hr', params.to_json)
+    end
+
+    def historical_engagement(options = {})
+      params = default_historical_options.merge(options)
       post('/insights/engagement/historical', params.to_json)
     end
 
@@ -38,10 +41,10 @@ module Voyager
 
     def default_historical_options
       {
-        engagement_types: %w[impressions engagements favorites retweets replies video_views url_clicks hashtag_clicks detail_expands permalink_clicks email_tweet user_follows user_profile_clicks],
+        engagement_types: %w[impressions engagements favorites retweets replies video_views media_views media_engagements url_clicks hashtag_clicks detail_expands permalink_clicks email_tweet user_follows user_profile_clicks],
         groupings: {
-          by_tweet_by_day: {
-            group_by: %w[tweet.id engagement.day engagement.type]
+          hourly_by_tweet_and_type: {
+            group_by: %w[tweet.id engagement.type engagement.day engagement.hour]
           }
         }
       }

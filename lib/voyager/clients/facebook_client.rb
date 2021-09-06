@@ -178,6 +178,10 @@ module Voyager
     # Metrics
     # ============================================================================
 
+    def posts(object_id = 'me', options = {})
+      get("/#{object_id}/posts", options)
+    end
+
     def insights(object_id = 'me', options = {})
       get("/#{object_id}/insights", options)
     end

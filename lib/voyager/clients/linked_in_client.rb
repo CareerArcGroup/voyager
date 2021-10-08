@@ -127,6 +127,27 @@ module Voyager
       perform_request(:get, path)
     end
 
+    def share_statistics(entity_urn, post_urns, start_date = nil, end_date = nil)
+      path = "/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=#{CGI.escape(entity_urn)}"
+
+      if post_urns
+        path += "&shares=List(#{post_urns.map { |u| CGI.escape(u) }.join(',')})"
+      end
+
+      if start_date && end_date
+        # milliseconds since epoch
+        formatted_start = start_date.to_datetime.strftime('%Q')
+        formatted_end = end_date.to_datetime.strftime('%Q')
+
+        path = "#{path}&timeIntervals=(timeRange:(start:#{formatted_start},end:#{formatted_end}),timeGranularityType:DAY)"
+      end
+
+      # calling this directly because we need to not encode the : inside of parentheses
+      # but inside of URNs, we do need to encode :. We are encoding inside of this method
+      # and bypassing generic encoding, but should update to find a generic way to do this.
+      perform_request(:get, path)
+    end
+
     def network_size(entity_urn)
       path = "/networkSizes/#{CGI.escape(entity_urn)}?edgeType=CompanyFollowedByMember"
       get(path)

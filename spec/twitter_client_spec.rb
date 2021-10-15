@@ -131,6 +131,16 @@ describe TwitterClient do
       response.data["ids"].size.should be > 0
     end
 
+    it "can retrieve the followers count for a batch of users" do
+      test_ids = test_ids = ["1112713088568950784", "14399987", "1112713088568950784", "305191141", "339329090", "1362070688438263809", "1362061179149975553", "1362070688438263809", "339329090", "1378010716020469760"]
+      response = config.client.bulk_follower_count(test_ids.join(','))
+      expect(response).to be_successful
+
+      follower_counts = response.data.map { |entity| entity['followers_count'] }
+      expect(follower_counts).not_to be_empty
+      expect(follower_counts).to all(be_an(Integer))
+    end
+
     context "uploading_media" do
       let(:url)    { "http://staging-careerarc-com.s3.amazonaws.com/test/twitter_card.jpg" }
       let(:client) { config.client }

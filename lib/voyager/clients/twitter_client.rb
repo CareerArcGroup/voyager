@@ -194,6 +194,11 @@ module Voyager
       get("/users/#{user_id}", options)
     end
 
+    def bulk_follower_count(user_id_string, options = {})
+      options.merge!(user_id: user_id_string, include_entites: false)
+      get("/users/lookup.json", options)
+    end
+
     def v2_recent_tweets(options = {})
      get('/tweets/search/recent', options)
     end

@@ -15,7 +15,7 @@ module Voyager
     end
 
     def share(message, options={})
-      post("", merge_default_options(options.merge(text: message)))
+      post("#{@options[:site]}#{@options[:path_prefix]}", merge_default_options(options.merge(text: message)))
     end
 
     # ============================================================================

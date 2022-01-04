@@ -7,7 +7,8 @@ module Voyager
     MAX_CHUNK_SIZE = 3*1024*1024
     MEDIA_CATEGORIES = {
       'image' => 'tweet_image',
-      'gif'   => 'tweet_gif'
+      'gif'   => 'tweet_gif',
+      'video' => 'tweet_video'
     }.freeze
 
     # ============================================================================
@@ -207,10 +208,10 @@ module Voyager
       get('/tweets', options)
     end
 
-    def upload_media(image_url, image_class)
-      io = Voyager::Util.upload_from(image_url)
+    def upload_media(media_url, media_type)
+      io = Voyager::Util.upload_from(media_url)
       tot_chunks = (io.size.to_f/MAX_CHUNK_SIZE).ceil
-      media_category = MEDIA_CATEGORIES[image_class]
+      media_category = MEDIA_CATEGORIES[media_type]
 
       init_resp = upload_init(io.size, io.content_type, media_category)
       return init_resp unless init_resp.successful?

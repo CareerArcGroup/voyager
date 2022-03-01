@@ -153,6 +153,11 @@ module Voyager
       get(path)
     end
 
+    def connection_size(user_external_id)
+      path = CGI.escape("urn:li:person:#{user_external_id}")
+      get("/connections/#{path}")
+    end
+
     protected
 
     def uri_with_query(url, query={})

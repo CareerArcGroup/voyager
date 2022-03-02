@@ -3,7 +3,8 @@ module Voyager
 
     def self.parse_response(response, data)
       super(response, data)
-    end
 
+      response.successful = data.is_a?(Net::HTTPOK)
+    end
   end
 end

@@ -98,6 +98,11 @@ describe LinkedInClient do
       response.successful?.should be true
       response.data["activity"].nil?.should be false
     end
+
+    it 'can get amount of user connections' do
+      connections = config.client.connection_size(LINKEDIN_SHARES_PROFILE_ID)
+      connections.data['firstDegreeSize'] >= 0
+    end
   end
 
   context "with invalid LinkedIn credentials" do

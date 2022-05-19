@@ -166,12 +166,16 @@ module Voyager
     # Insgram Media Methods
     # ============================================================================
 
-    def ig_media(ig_account_id, options = {})
+    def ig_media_upload(ig_account_id, options = {})
       post("/#{ig_account_id}/media", options)
     end
 
     def ig_media_publish(ig_account_id, creation_id)
       post("/#{ig_account_id}/media_publish", creation_id: creation_id)
+    end
+
+    def ig_media(ig_account_id, options = {})
+      get("/#{ig_account_id}/media", options)
     end
 
     # ============================================================================

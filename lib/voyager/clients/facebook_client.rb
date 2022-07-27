@@ -178,6 +178,10 @@ module Voyager
       get("/#{ig_account_id}/media", options)
     end
 
+    def ig_media_status(container_id)
+      get("/#{container_id}?fields=status,status_code,id")
+    end
+
     # ============================================================================
     # Page Methods
     # ============================================================================

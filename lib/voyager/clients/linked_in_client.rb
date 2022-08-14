@@ -10,6 +10,7 @@ module Voyager
       options[:authorize_url] ||= 'https://www.linkedin.com/oauth/v2/authorization'
       options[:token_url]     ||= 'https://www.linkedin.com/oauth/v2/accessToken'
       options[:path_prefix] ||= '/v2'
+      options[:api_version] ||= '202208'
 
       super(options)
     end
@@ -53,6 +54,36 @@ module Voyager
       put(url, file)
     end
 
+    # ============================================================================
+    # Videos
+    # ============================================================================
+
+
+    def upload_video(action, options={})
+      headers = { 'LinkedIn-Version' =>  api_version }
+
+      post("/videos?action=#{action}", options, headers)
+    end
+
+    def video_initialize(options={})
+      upload_video('initializeUpload', options)
+    end
+
+    def video_finalize(options={})
+      upload_video('finalizeUpload', options)
+    end
+
+    def video(video_urn)
+       headers = { 'X-Restli-Protocol-Version' => nil }
+
+       get("/videos/#{video_urn}", {}, headers)
+    end
+
+    def li_post(options={})
+      headers = { 'LinkedIn-Version' => api_version }
+
+      post("/posts", options, headers)
+    end
     # def upload(url, opts={})
     #   # TODO: figure out how to use standard Net::HTTP request to do this.
     #   # Known issue: Documentation recommends PUT request, but API responds
@@ -189,5 +220,8 @@ module Voyager
       Voyager::LinkedInParser
     end
 
+    def api_version
+       options[:api_version]
+    end
   end
 end

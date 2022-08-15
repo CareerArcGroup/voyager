@@ -74,7 +74,10 @@ module Voyager
     end
 
     def video(video_urn)
-       headers = { 'X-Restli-Protocol-Version' => nil }
+      headers = {
+        'X-Restli-Protocol-Version' => nil,
+        'LinkedIn-Version' => api_version
+      }
 
        get("/videos/#{video_urn}", {}, headers)
     end

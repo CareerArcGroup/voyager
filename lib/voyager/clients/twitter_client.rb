@@ -173,6 +173,10 @@ module Voyager
       post("/statuses/update.json", options.merge(status: message))
     end
 
+    def tweet_v2(options)
+      post('https://api.twitter.com/2/tweets', options.to_json, 'Content-Type' => 'application/json' )
+    end
+
     # Destroys the status specified by the required ID parameter. The authenticating user must
     # be the author of the specified status. Returns the destroyed status if successful.
     def un_tweet(tweet_id)

@@ -164,8 +164,14 @@ module Voyager
     def share_statistics(entity_urn, post_urns, start_date = nil, end_date = nil)
       path = "/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=#{CGI.escape(entity_urn)}"
 
-      if post_urns
-        path += "&shares=List(#{post_urns.map { |u| CGI.escape(u) }.join(',')})"
+      share_urns, ugc_urns = post_urns.partition { |urn| urn.start_with?('urn:li:share:') }
+
+      if share_urns.any?
+        path += "&shares=List(#{share_urns.map { |u| CGI.escape(u) }.join(',')})"
+      end
+
+      if ugc_urns.any?
+        path += "&ugcPosts=List(#{ugc_urns.map { |u| CGI.escape(u) }.join(',')})"
       end
 
       if start_date && end_date

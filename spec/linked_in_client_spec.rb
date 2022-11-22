@@ -103,6 +103,46 @@ describe LinkedInClient do
       connections = config.client.connection_size(LINKEDIN_SHARES_PROFILE_ID)
       connections.data['firstDegreeSize'] >= 0
     end
+
+    it 'can get share statistics for `shares`' do
+      allow(config.client).to receive(:perform_request)
+
+      entity_urn = 'urn:li:organization:1'
+      share_urn = 'urn:li:share:2'
+
+      config.client.share_statistics(entity_urn, [share_urn])
+
+      expect(config.client).to have_received(:perform_request).with(
+        :get, "/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=#{CGI.escape(entity_urn)}&shares=List(#{CGI.escape(share_urn)})"
+      )
+    end
+
+    it 'can get share statistics for `ugcPosts`' do
+      allow(config.client).to receive(:perform_request)
+
+      entity_urn = 'urn:li:organization:1'
+      ugc_post_urn = 'urn:li:ugcPost:2'
+
+      config.client.share_statistics(entity_urn, [ugc_post_urn])
+
+      expect(config.client).to have_received(:perform_request).with(
+        :get, "/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=#{CGI.escape(entity_urn)}&ugcPosts=List(#{CGI.escape(ugc_post_urn)})"
+      )
+    end
+
+    it 'can get share statistics for `shares` and `ugcPosts`' do
+      allow(config.client).to receive(:perform_request)
+
+      entity_urn = 'urn:li:organization:1'
+      share_urn = 'urn:li:share:2'
+      ugc_post_urn = 'urn:li:ugcPost:3'
+
+      config.client.share_statistics(entity_urn, [share_urn, ugc_post_urn])
+
+      expect(config.client).to have_received(:perform_request).with(
+        :get, "/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=#{CGI.escape(entity_urn)}&shares=List(#{CGI.escape(share_urn)})&ugcPosts=List(#{CGI.escape(ugc_post_urn)})"
+      )
+    end
   end
 
   context "with invalid LinkedIn credentials" do

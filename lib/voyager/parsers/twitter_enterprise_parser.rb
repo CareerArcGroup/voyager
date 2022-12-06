@@ -13,7 +13,7 @@ module Voyager
       def parse_response(response, data)
         super(response, data)
 
-        return unless data[MINUTE_RATE_LIMIT_REMAINING_HEADER].present? || data[SECOND_RATE_LIMIT_REMAINING_HEADER].present?
+        return unless response.rate_limited?
 
         if data[MINUTE_RATE_LIMIT_REMAINING_HEADER].to_i.zero?
           response.rate_limited = true

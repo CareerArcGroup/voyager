@@ -39,22 +39,6 @@ module Voyager
     end
 
     # ============================================================================
-    # Assets - for sharing multi-image posts
-    # ============================================================================
-
-    def register_upload(options={})
-      post("/assets?action=registerUpload", options)
-    end
-
-    def upload_status(asset_id)
-      get("/assets/#{asset_id}")
-    end
-
-    def upload(url, file)
-      put(url, file)
-    end
-
-    # ============================================================================
     # Videos
     # ============================================================================
 
@@ -73,13 +57,32 @@ module Voyager
       upload_video('finalizeUpload', options)
     end
 
-    def video(video_urn)
+
+    # ============================================================================
+    # images
+    # ============================================================================
+
+    def upload_image(action, options={})
+      headers = { 'LinkedIn-Version' =>  api_version }
+
+      post("/images?action=#{action}", options, headers)
+    end
+
+    def image_initialize(options={})
+      upload_image('initializeUpload', options)
+    end
+
+    def upload(url, file)
+      put(url, file)
+    end
+
+    def image(image_urn)
       headers = {
         'X-Restli-Protocol-Version' => nil,
         'LinkedIn-Version' => api_version
       }
 
-       get("/videos/#{video_urn}", {}, headers)
+       get("/images/#{image_urn}", {}, headers)
     end
 
     def li_post(options={})
@@ -87,20 +90,6 @@ module Voyager
 
       post("/posts", options, headers)
     end
-    # def upload(url, opts={})
-    #   # TODO: figure out how to use standard Net::HTTP request to do this.
-    #   # Known issue: Documentation recommends PUT request, but API responds
-    #   # to PUT reqeusts saying they're not allowed.
-    #   resp = %x{
-    #     curl -iv --upload-file \
-    #       \"#{Voyager::Util.upload_from(opts[:source]).local_path}\" \
-    #       \"#{URI(url)}\" \
-    #       -H "Authorization: Bearer #{token}" \
-    #       -H 'X-Restli-Protocol-Version: 2.0.0'
-    #   }
-
-    #   Voyager::Response.new(opts[:id], resp, response_parser)
-    # end
 
     # ============================================================================
     # Account Methods - These act on the API account

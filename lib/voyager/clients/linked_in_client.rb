@@ -57,6 +57,15 @@ module Voyager
       upload_video('finalizeUpload', options)
     end
 
+    def video(video_urn)
+      headers = {
+        'X-Restli-Protocol-Version' => nil,
+        'LinkedIn-Version' => api_version
+      }
+
+       get("/videos/#{video_urn}", {}, headers)
+    end
+
 
     # ============================================================================
     # images

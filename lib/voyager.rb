@@ -21,6 +21,7 @@ require 'voyager/clients/facebook_client'
 require 'voyager/clients/slack_client'
 require 'voyager/clients/bitly_client'
 require 'voyager/clients/microsoft_graph_client'
+require 'voyager/clients/apple_client'
 
 require 'voyager/parser'
 require 'voyager/parsers/json_parser'

@@ -64,6 +64,10 @@ module Voyager
       perform_request(:put, path, body, headers)
     end
 
+    def delete(path, params={}, headers={})
+      perform_request(:delete, uri_with_query(path, params), '', headers)
+    end
+
     # ============================================================================
     # Core HTTP methods
     # ============================================================================
@@ -79,6 +83,7 @@ module Voyager
       http_logger.reset!
 
       http_request = build_request(request)
+
       http_response = http_start(uri) do |http|
         http.request(http_request)
       end
@@ -101,6 +106,8 @@ module Voyager
       http_request = case request.method
         when :get
           Net::HTTP::Get.new(request_uri)
+        when :delete
+          Net::HTTP::Delete.new(request_uri)
         when :post
           multipart?(request.body) ?
             Net::HTTP::Post::Multipart.new(request_uri, to_multipart_params(request.body)) :

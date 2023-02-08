@@ -5,7 +5,7 @@ module Voyager
     def self.parse_response(response, data, error_key = nil)
       super(response, data)
 
-      if response.raw_data? || data.body.length < 2
+      if response.raw_data? || data.body.nil? || data.body.length < 2
         response.data       = data.body
         response.successful = true
       else

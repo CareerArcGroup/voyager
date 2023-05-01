@@ -5,8 +5,8 @@ module Voyager
     def initialize(options = {})
 
       options[:path_prefix]   ||= "/api/v1/companies/#{options[:company_id]}"
-      options[:site]          ||= 'https://api-qualification.businessconnect.apple.com/'
-      options[:token_url] ||= "https://api-qualification.businessconnect.apple.com/api/v1/oauth2/token"
+      options[:site]          ||= 'https://data-qualification.businessconnect.apple.com/'
+      options[:token_url] ||= "https://data-qualification.businessconnect.apple.com/api/v1/oauth2/token"
 
       super(options)
     end

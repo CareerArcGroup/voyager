@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Voyager
-  VERSION = '0.4'
+  VERSION = '0.4.1'
 end

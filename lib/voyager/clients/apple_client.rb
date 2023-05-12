@@ -3,10 +3,9 @@
 module Voyager
   class AppleClient < OAuth2Client
     def initialize(options = {})
-
       options[:path_prefix]   ||= "/api/v1/companies/#{options[:company_id]}"
       options[:site]          ||= 'https://data-qualification.businessconnect.apple.com/'
-      options[:token_url] ||= "https://data-qualification.businessconnect.apple.com/api/v1/oauth2/token"
+      options[:token_url] ||= "#{options[:site]}api/v1/oauth2/token"
 
       super(options)
     end
@@ -16,79 +15,77 @@ module Voyager
     end
 
     def create_business(params = {})
-      ensure_token do
-        post("/businesses", params)
-      end
+      ensure_token if ensure_token?
+
+      post('/businesses', params)
     end
 
     def update_business(business_id, params = {})
-      ensure_token do
-        put("/businesses/#{business_id}", params)
-      end
+      ensure_token if ensure_token?
+
+      put("/businesses/#{business_id}", params)
     end
 
     def business(business_id)
-      ensure_token do
-        get("/businesses/#{business_id}")
-      end
+      ensure_token if ensure_token?
+
+      get("/businesses/#{business_id}")
     end
 
     def businesses
-      ensure_token do
-        get("/businesses")
-      end
+      ensure_token if ensure_token?
+
+      get('/businesses')
     end
 
     def delete_business(business_id)
-      ensure_token do
-        delete("/businesses/#{business_id}")
-      end
+      ensure_token if ensure_token?
+
+      delete("/businesses/#{business_id}")
     end
 
     def create_location(params = {})
-      ensure_token do
-        post("/locations", params)
-      end
+      ensure_token if ensure_token?
+
+      post('/locations', params)
     end
 
     def location(location_id)
-      ensure_token do
-        get("/locations/#{location_id}")
-      end
+      ensure_token if ensure_token?
+
+      get("/locations/#{location_id}")
     end
 
     def locations
-      ensure_token do
-        get("/locations")
-      end
+      ensure_token if ensure_token?
+
+      get('/locations')
     end
 
     def update_location(location_id, etag, params = {})
-      headers = { 'if-match' =>  etag }
+      ensure_token if ensure_token?
+      headers = { 'if-match' => etag }
 
-      ensure_token do
-        put("/locations/#{location_id}", params, headers)
-      end
+      put("/locations/#{location_id}", params, headers)
     end
 
     def delete_location(location_id, etag)
-      headers = { 'if-match' =>  etag }
+      ensure_token if ensure_token?
+      headers = { 'if-match' => etag }
 
-      ensure_token do
-        delete("/locations/#{location_id}", {}, headers)
-      end
+      delete("/locations/#{location_id}", {}, headers)
     end
 
     def feedback(resource_type, resource_id)
-      ensure_token do
-        get("/feedback?ql=resourceType==#{resource_type};resourceId==#{resource_id}")
-      end
+      ensure_token if ensure_token?
+
+      get("/feedback?ql=resourceType==#{resource_type};resourceId==#{resource_id}")
     end
 
-    def add_standard_headers(headers={})
+    def add_standard_headers(headers = {})
       additional_headers = {
         'Accept' => 'application/json',
-        'Content-Type' => 'application/json',
+        'Content-Type' => 'application/json'
       }
 
       super(additional_headers.merge(headers))
@@ -111,7 +108,7 @@ module Voyager
       Voyager::JsonParser
     end
 
-    def get_token
+    def retrieve_token
       result = post(options[:token_url], token_options)
 
       @token = nil
@@ -122,9 +119,11 @@ module Voyager
     end
 
     def ensure_token
-      get_token if token.blank? || access_token.expired?
+      retrieve_token if token.blank? || access_token.expired?
+    end
 
-      yield
+    def ensure_token?
+      options[:ensure_token]
     end
   end
 end

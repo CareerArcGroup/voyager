@@ -10,7 +10,7 @@ module Voyager
       options[:authorize_url] ||= 'https://www.linkedin.com/oauth/v2/authorization'
       options[:token_url]     ||= 'https://www.linkedin.com/oauth/v2/accessToken'
       options[:path_prefix] ||= '/v2'
-      options[:api_version] ||= '202211'
+      options[:api_version] ||= '202311'
 
       super(options)
     end
@@ -42,7 +42,6 @@ module Voyager
     # Videos
     # ============================================================================
 
-
     def upload_video(action, options={})
       headers = { 'LinkedIn-Version' =>  api_version }
 
@@ -65,7 +64,6 @@ module Voyager
 
        get("/videos/#{video_urn}", {}, headers)
     end
-
 
     # ============================================================================
     # images

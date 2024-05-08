@@ -15,7 +15,7 @@ module Voyager
 
     def initialize(options = {})
       options[:site] ||= 'https://graph.facebook.com'
-      options[:path_prefix] ||= '/v13.0'
+      options[:path_prefix] ||= '/v19.0'
       super(options)
     end
 

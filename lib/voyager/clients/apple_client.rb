@@ -3,7 +3,7 @@
 module Voyager
   class AppleClient < OAuth2Client
     def initialize(options = {})
-      options[:api_version]   ||= 'v2'
+      options[:api_version]   ||= 'v3'
       options[:path_prefix]   ||= "/api/#{options[:api_version]}/companies/#{options[:company_id]}"
       options[:site]          ||= 'https://data-qualification.businessconnect.apple.com/'
       options[:token_url]     ||= "#{options[:site]}api/#{options[:api_version]}/oauth2/token"
@@ -15,34 +15,34 @@ module Voyager
       options[:company_id]
     end
 
-    def create_business(params = {})
+    def create_brand(params = {})
       ensure_token if ensure_token?
 
-      post('/businesses', params)
+      post('/brands', params)
     end
 
-    def update_business(business_id, params = {})
+    def update_brand(brand_id, params = {})
       ensure_token if ensure_token?
 
-      put("/businesses/#{business_id}", params)
+      put("/brands/#{brand_id}", params)
     end
 
-    def business(business_id)
+    def brand(brand_id)
       ensure_token if ensure_token?
 
-      get("/businesses/#{business_id}")
+      get("/brands/#{brand_id}")
     end
 
-    def businesses
+    def brands
       ensure_token if ensure_token?
 
-      get('/businesses')
+      get('/brands')
     end
 
-    def delete_business(business_id)
+    def delete_brand(brand_id)
       ensure_token if ensure_token?
 
-      delete("/businesses/#{business_id}")
+      delete("/brands/#{brand_id}")
     end
 
     def create_location(params = {})

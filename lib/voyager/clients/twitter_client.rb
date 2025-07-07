@@ -96,38 +96,6 @@ module Voyager
     # User Methods - These act on specified users
     # ============================================================================
 
-    # Allows the authenticating users to follow the user specified in the ID parameter.
-    # Returns the befriended user in the requested format when successful. Returns a string
-    # describing the failure condition when unsuccessful. If you are already friends with the
-    # user a HTTP 403 may be returned, though for performance reasons you may get a 200 OK
-    # message even if the friendship already exists.
-    def add_friend(friend_id, follow=true)
-      post("/friendships/create.json", user_id: friend_id, follow: follow)
-    end
-
-    # Allows the authenticating users to follow the user specified in the ID parameter.
-    # Returns the befriended user in the requested format when successful. Returns a string
-    # describing the failure condition when unsuccessful. If you are already friends with the
-    # user a HTTP 403 may be returned, though for performance reasons you may get a 200 OK
-    # message even if the friendship already exists.
-    def add_friend_by_screen_name(screen_name, follow=true)
-      post("/friendships/create.json", screen_name: screen_name, follow: follow)
-    end
-
-    # Allows the authenticating users to un-follow the user specified in the ID parameter.
-    # Returns the un-followed user in the requested format when successful. Returns a string
-    # describing the failure condition when unsuccessful.
-    def un_friend(friend_id)
-      post("/friendships/destroy.json", user_id: friend_id)
-    end
-
-    # Allows the authenticating users to un-follow the user specified in the ID parameter.
-    # Returns the un-followed user in the requested format when successful. Returns a string
-    # describing the failure condition when unsuccessful.
-    def un_friend_by_screen_name(screen_name)
-      post("/friendships/destroy.json", screen_name: screen_name)
-    end
-
     # Test for the existence of friendship between two users. Will return true if user_a follows user_b,
     # otherwise will return false. Authentication is required if either user A or user B are protected.
     # Additionally the authenticating user must be a follower of the protected user.
@@ -135,22 +103,6 @@ module Voyager
     def follower_ids(user_id, options={})
       get("/followers/ids.json", options.merge(user_id: user_id))
     end
-
-    # Test for the existence of friendship between two users. Will return true if user_a follows user_b,
-    # otherwise will return false. Authentication is required if either user A or user B are protected.
-    # Additionally the authenticating user must be a follower of the protected user.
-    # Options: cursor
-    def follower_ids_by_screen_name(screen_name, options={})
-      get("/followers/ids.json", options.merge(screen_name: screen_name))
-    end
-
-    # Returns detailed information about the relationship between two users.
-    def get_friendship(a, b)
-      get("/friendships/show.json", source_screen_name: a, target_screen_name: b)
-    end
-
-    alias :friend :add_friend_by_screen_name
-    alias :unfriend :un_friend_by_screen_name
 
     # ============================================================================
     # Status Methods - These act on Tweets
@@ -277,6 +229,18 @@ module Voyager
         get(
           upload_endpoint,
           { command: 'STATUS', media_id: media_id }
+        )
+      end
+    end
+
+    def media_metadata(media_id, alt_text)
+      with_site(upload_site) do
+        post(
+          '/media/metadata/create.json',
+          {
+            media_id: media_id,
+            alt_text: { text: alt_text }
+          }
         )
       end
     end

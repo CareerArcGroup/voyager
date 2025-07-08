@@ -240,7 +240,8 @@ module Voyager
           {
             media_id: media_id,
             alt_text: { text: alt_text }
-          }
+          }.to_json,
+          { 'Content-Type' => 'application/json' }
         )
       end
     end

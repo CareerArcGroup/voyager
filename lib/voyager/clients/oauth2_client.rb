@@ -9,7 +9,7 @@ module Voyager
     # filter sensitive data out of all requests...
     # some of these should never appear in the request anyway,
     # but they're listed here just to be safe...
-    filtered_attributes :client_id, :client_secret, :token
+    filtered_attributes :client_id, :client_secret, :token, :refresh_token, :basic_auth_credentials
 
     # ============================================================================
     # Client Initializers and Public Methods
@@ -22,6 +22,7 @@ module Voyager
     def authorize(code, redirect_uri, options = {})
       @access_token = oauth_client.auth_code.get_token(code, options.merge(redirect_uri: redirect_uri, mode: token_mode))
       @token = @access_token.token
+      @refresh_token = @access_token.refresh_token
       @access_token
     end
 
@@ -31,6 +32,7 @@ module Voyager
       refreshed_token = access_token.refresh!
 
       @token = refreshed_token&.token
+      @refresh_token = refreshed_token&.refresh_token
       @access_token = refreshed_token
     end
 
@@ -50,6 +52,10 @@ module Voyager
       @token ||= options[:token]
     end
 
+    def refresh_token
+      @refresh_token ||= options[:refresh_token]
+    end
+
     def token_mode
       options.fetch(:token_mode, :header)
     end
@@ -63,16 +69,29 @@ module Voyager
     OAUTH_CLIENT_OPTIONS = %i[site redirect_uri authorize_url token_url token_method auth_scheme connection_opts max_redirects raise_errors].freeze
     ACCESS_TOKEN_OPTIONS = %i[refresh_token expires_in expires_at mode header_format param_name].freeze
 
+    # oauth2 v2 flipped the default :auth_scheme from :request_body to :basic_auth.
+    # Basic works on the token endpoints we talk to, but it hides the client
+    # credentials from #filtered_terms (they arrive base64-encoded), so keep the v1
+    # scheme unless a client asks for something else...
+    OAUTH_CLIENT_DEFAULTS = { auth_scheme: :request_body }.freeze
+
     def oauth_client
       @oauth_client ||= OAuth2::Client.new(client_id, client_secret, oauth_client_options)
     end
 
+    # oauth2 v2 raises when an access token is built with neither a token nor a
+    # refresh token. Clients without credentials still have work to do -- fetching
+    # a token of their own, or probing #authorized? -- so they go without an access
+    # token, and their requests go out unsigned, as they did under oauth2 v1...
     def access_token
-      @access_token ||= OAuth2::AccessToken.new(oauth_client, token, access_token_options)
+      return @access_token if @access_token
+      return nil if token.to_s.empty? && refresh_token.to_s.empty?
+
+      @access_token = OAuth2::AccessToken.new(oauth_client, token, access_token_options)
     end
 
     def oauth_client_options
-      options.select { |k, _v| OAUTH_CLIENT_OPTIONS.include? k }.merge(common_options)
+      OAUTH_CLIENT_DEFAULTS.merge(options.select { |k, _v| OAUTH_CLIENT_OPTIONS.include? k }).merge(common_options)
     end
 
     def access_token_options
@@ -83,9 +102,9 @@ module Voyager
       { connection_build: method(:build_connection) }
     end
 
-    # when we build a request, sign it with the access token...
+    # when we build a request, sign it with the access token, if we have one...
     def build_request(request)
-      super.tap { |r| access_token.headers.each { |h, v| r[h] = v } }
+      super.tap { |r| access_token&.headers&.each { |h, v| r[h] = v } }
     end
 
     def build_connection(builder)
@@ -100,6 +119,13 @@ module Voyager
       else
         body.to_s
       end
+    end
+
+    # with :auth_scheme => :basic_auth the client credentials are base64-encoded
+    # into the Authorization header, where filtering them by value can't reach
+    # them, so filter the encoded credentials themselves...
+    def basic_auth_credentials
+      %r{Authorization:\s*"?Basic\s+(?<filtered>[A-Za-z0-9+/=]+)}i
     end
 
     class FilteredLogger < Faraday::Response::Logger

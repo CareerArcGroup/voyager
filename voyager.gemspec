@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
 
   s.add_dependency "oauth", "~> 0"
-  s.add_dependency "oauth2", "~> 1.4"
+  s.add_dependency "oauth2", ">= 2.0.22", "< 3"
   s.add_dependency "json", "~> 2.2"
   s.add_dependency "multipart-post", "~> 2.1.1"
   s.add_development_dependency "bundler", ">= 2.4.8"

@@ -120,7 +120,7 @@ module Voyager
     end
 
     def ensure_token
-      retrieve_token if token.blank? || access_token.expired?
+      retrieve_token if token.blank? || access_token&.expired?
     end
 
     def ensure_token?

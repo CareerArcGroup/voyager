@@ -22,6 +22,7 @@ module Voyager
     def authorize(code, redirect_uri, options = {})
       @access_token = oauth_client.auth_code.get_token(code, options.merge(redirect_uri: redirect_uri, mode: token_mode))
       @token = @access_token.token
+      @refresh_token = @access_token.refresh_token
       @access_token
     end
 
@@ -31,6 +32,7 @@ module Voyager
       refreshed_token = access_token.refresh!
 
       @token = refreshed_token&.token
+      @refresh_token = refreshed_token&.refresh_token
       @access_token = refreshed_token
     end
 
@@ -51,7 +53,7 @@ module Voyager
     end
 
     def refresh_token
-      options[:refresh_token]
+      @refresh_token ||= options[:refresh_token]
     end
 
     def token_mode
@@ -123,7 +125,7 @@ module Voyager
     # into the Authorization header, where filtering them by value can't reach
     # them, so filter the encoded credentials themselves...
     def basic_auth_credentials
-      %r{Basic (?<filtered>[A-Za-z0-9+/=]+)}
+      %r{Authorization:\s*"?Basic\s+(?<filtered>[A-Za-z0-9+/=]+)}i
     end
 
     class FilteredLogger < Faraday::Response::Logger

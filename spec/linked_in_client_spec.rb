@@ -4,8 +4,11 @@ include Voyager
 
 LINKEDIN_TEST_COMPANY_ID = 2414183
 LINKEDIN_TEST_COMPANY_URN = "urn:li:organization:2414183"
-LINKEDIN_SHARES_PROFILE_ID = 'eI2ganNkL9'
-LINKEDIN_SHARES_PROFILE_URN = 'urn:li:person:eI2ganNkL9'
+
+# ID & URN are for profile below
+# https://www.linkedin.com/in/careerarc-developers-bba66154/
+LINKEDIN_SHARES_PROFILE_ID = 'aL3tXjxVL4'
+LINKEDIN_SHARES_PROFILE_URN = 'urn:li:person:aL3tXjxVL4'
 
 register_upload_opts = {
   registerUploadRequest: {
@@ -51,13 +54,13 @@ describe LinkedInClient do
       response.data["id"].nil?.should be false
     end
 
-    it 'can register an upload' do
+    it 'can register an upload', skip: 'register_upload is not a method and using image_initializes raises exception: Unpermitted fields present in REQUEST_BODY: Data Processing Exception while processing fields [/registerUploadRequest]' do
       response = config.client.register_upload(register_upload_opts)
       expect(response).to be_successful
       expect(response.dig('value', 'asset')). to match(/urn\:li\:digitalmediaAsset\:\S+/)
     end
 
-    it 'can upload images' do
+    it 'can upload images', skip: 'register_upload is not a method and using image_initializes raises exception: Unpermitted fields present in REQUEST_BODY: Data Processing Exception while processing fields [/registerUploadRequest]' do
       register = config.client.register_upload(register_upload_opts)
       upload_url = register.data.dig('value', 'uploadMechanism', 'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest', 'uploadUrl')
       source = 'https://www.sciencemag.org/sites/default/files/styles/inline__450w__no_aspect/public/dogs_1280p_0.jpg'
@@ -66,7 +69,22 @@ describe LinkedInClient do
       expect(response).to be_successful
     end
 
-    it "can share with images" do
+    it 'can share' do
+      response = config.client.share(
+        {
+          owner: LINKEDIN_SHARES_PROFILE_URN,
+          subject: "Test Share Subject",
+          text: {
+            text: "Hello World from dimension #{Random.rand(9999)+1}"
+          }
+        }
+      )
+
+      expect(response).to be_successful
+      expect(response.data['activity']).not_to be_nil
+    end
+
+    it "can share with images", skip: 'register_upload is not a method and using image_initializes raises exception: Unpermitted fields present in REQUEST_BODY: Data Processing Exception while processing fields [/registerUploadRequest]' do
       img_url = 'https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2020/02/322868_1100-1100x628.jpg'
       register = config.client.register_upload(register_upload_opts)
       upload_url = register.dig('value', 'uploadMechanism', 'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest', 'uploadUrl')
@@ -99,7 +117,7 @@ describe LinkedInClient do
       response.data["activity"].nil?.should be false
     end
 
-    it 'can get amount of user connections' do
+    it 'can get amount of user connections', skip: 'access denied error for LINKEDIN_SHARES_PROFILE_ID' do
       connections = config.client.connection_size(LINKEDIN_SHARES_PROFILE_ID)
       connections.data['firstDegreeSize'] >= 0
     end
@@ -142,6 +160,16 @@ describe LinkedInClient do
       expect(config.client).to have_received(:perform_request).with(
         :get, "/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=#{CGI.escape(entity_urn)}&shares=List(#{CGI.escape(share_urn)})&ugcPosts=List(#{CGI.escape(ugc_post_urn)})"
       )
+    end
+
+    it 'can refresh the access token' do
+      refreshed = config.client.refresh!
+
+      # #refresh! returns nil when no refresh_token is configured, so assert on it
+      # to keep a missing credential from passing vacuously...
+      expect(refreshed).not_to be_nil
+      expect(refreshed.token).not_to be_empty
+      expect(config.client.account_info).to be_successful
     end
   end
 

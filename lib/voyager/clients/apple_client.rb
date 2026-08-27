@@ -3,7 +3,7 @@
 module Voyager
   class AppleClient < OAuth2Client
     def initialize(options = {})
-      options[:api_version]   ||= 'v3'
+      options[:api_version]   ||= 'v1'
       options[:path_prefix]   ||= "/api/#{options[:api_version]}/orgs/#{options[:org_id]}"
       options[:site]          ||= 'https://data-qualification.api-business.apple.com/'
       options[:token_url]     ||= "#{options[:site]}api/#{options[:api_version]}/oauth2/token"

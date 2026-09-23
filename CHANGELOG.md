@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.4.15]
+
+- Upgrade `oauth` from `~> 0` to `~> 1.1, >= 1.1.8`.
+
 ## [0.4.13]
 
 - Upgrade `oauth2` from `~> 1.4` to `>= 2.0.22, < 3` for [GHSA-pp92-crg2-gfv9][GHSA-pp92-crg2-gfv9] / CVE-2026-54603.

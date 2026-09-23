@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.homepage	= 'https://github.com/CareerArcGroup/voyager'
   s.license = 'MIT'
 
-  s.add_dependency "oauth", "~> 0"
+  s.add_dependency "oauth", "~> 1.1", ">= 1.1.8"
   s.add_dependency "oauth2", ">= 2.0.22", "< 3"
   s.add_dependency "json", "~> 2.2"
   s.add_dependency "multipart-post", "~> 2.1.1"

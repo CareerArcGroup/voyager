@@ -4,6 +4,11 @@
 
 - Upgrade `oauth` from `~> 0` to `~> 1.1, >= 1.1.8`.
 
+## [0.4.14]
+
+- `Voyager::AppleClient` moves to the Apple Business API v1 (`api-business.apple.com`).
+- `Voyager::AppleClient` takes `org_id` instead of `company_id`.
+
 ## [0.4.13]
 
 - Upgrade `oauth2` from `~> 1.4` to `>= 2.0.22, < 3` for [GHSA-pp92-crg2-gfv9][GHSA-pp92-crg2-gfv9] / CVE-2026-54603.
